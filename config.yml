@@ -1,47 +1,34 @@
-game:
-  type: oldgold # nim or oldgold
-  g: 1 # number of games in a batch, up to 100
-  p: 1 # starting player option, 1, 2 or 3 (mixed)
-  m: 1500 # number of simulations (and hence rollouts) per actual game move
-
-verbose: True # Whether the details of moves for each game is shown
-
-mcts:
-  c: 1
 
 # |---------- Environment parameters ----------|
 
-board:
-  size: 6
-  shape: diamond #diamond or triangle
+game:
+  board_size: 5 # between 3 and 10
+  player: 1 # starting player option, 1, 2 or 3 (mixed) Vet ikke om vi skal ha med 3 nå?
+  verbose: True # Whether the details of moves for each game is shown
 
 display:
   node_size: 1500
+  new_piece_size: 3000
   initial_color: 'white'
-  filled_color: 'plum'
-  jump_from_color: 'silver'
-  jump_to_color: 'orange'
-  jump_from_size: 800
-  jump_to_size: 3000
+  p1_color: 'plum'
+  p2_color: 'orange'
   delay: 0.5 #seconds
   display_last_game: True # True or False
   plot_window_size: 20
 
 # |------------- Agent parameters -------------|
 
-RL_system:
-  episodes: 30 # t500
+agent:
+  c: 1 # exploration constant
+  episodes: 200 # number of episodes
+  simulations: 500 # number of simulations (and hence rollouts) per actual game move
+  m: 5 # number of ANETs to be cached for playing TOPP
+  g: 10 # number of games played in TOPP
 
-critic:
-  type: nn #table or NN
-  dimensions: [15, 20, 30, 1] # Number of nodes in each layer
-  learning_rate: 0.01 # t0.1, n0.001
-  eligibility_decay: 0.1 # b0.99
-  discount_factor: 0.99 # b0.99
-
-actor:
-  learning_rate: 0.1
-  eligibility_decay: 0.1 # b0.9
-  discount_factor: 0.9 # b0.9
-  init_epsilon: 1 # b1
-  epsilon_decay: 0.99 # t0.99 for 500, n0.995 for 1500
+nn:
+  learning_rate : 0.01
+  dimensions: [25, 35, 10, 25] # Number of nodes in each layer
+  activation_hidden: 'Tanh' # Choose between 'Linear', 'Sigmoid', 'Tanh' and 'ReLu'
+  activation_output: 'Softmax'
+  optimizer: 'Adam' # Choose between 'Adagrad', 'SGD', 'RMSprop' and 'Adam'
+  loss: 'CrossEntropyLoss'
