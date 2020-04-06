@@ -129,7 +129,9 @@ dmypy.json
 .pyre/
 
 venv
+.idea
 
 # VSCode
 .vscode/
+
 

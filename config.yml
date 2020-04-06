@@ -1,19 +1,10 @@
-game:
-  type: oldgold # nim or oldgold
-  g: 1 # number of games in a batch, up to 100
-  p: 1 # starting player option, 1, 2 or 3 (mixed)
-  m: 1500 # number of simulations (and hence rollouts) per actual game move
-
-verbose: True # Whether the details of moves for each game is shown
-
-mcts:
-  c: 1
 
 # |---------- Environment parameters ----------|
 
-board:
-  size: 6
-  shape: diamond #diamond or triangle
+game:
+  board_size: 4 # between 3 and 10
+  p: 1 # starting player option, 1, 2 or 3 (mixed)
+  verbose: True # Whether the details of moves for each game is shown
 
 display:
   node_size: 1500
@@ -27,10 +18,17 @@ display:
   display_last_game: True # True or False
   plot_window_size: 20
 
+
 # |------------- Agent parameters -------------|
 
-RL_system:
-  episodes: 30 # t500
+agent:
+  c: 1
+  g: 100 # number of episodes
+  m: 1500 # number of simulations (and hence rollouts) per actual game move
+
+nn:
+  learning_rate : 0.01
+
 
 critic:
   type: nn #table or NN
