@@ -26,6 +26,8 @@ agent:
 
 nn:
   learning_rate : 0.01
+  epsilon: 1
+  epsilon_decay: 0.99
   dimensions: [25, 35, 10, 25] # Number of nodes in each layer
   activation_hidden: 'Tanh' # Choose between 'Linear', 'Sigmoid', 'Tanh' and 'ReLu'
   activation_output: 'Softmax'
