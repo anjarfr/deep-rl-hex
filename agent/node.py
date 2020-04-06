@@ -1,5 +1,6 @@
 from math import log, sqrt, inf
 
+
 class Node:
 
     """ Node for generating tree structure """

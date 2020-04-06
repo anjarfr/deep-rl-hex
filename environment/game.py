@@ -7,13 +7,13 @@ random.seed(1337)
 
 class Game:
     """
-    Interface for the two games, including common methods
+    Interface for games
     """
 
     def __init__(self, cfg, verbose):
         self.verbose = verbose
-        self.size = cfg["board"]["size"]
-        self.initial_player = cfg["game"]["p"]
+        self.size = cfg["game"]["board_size"]
+        self.initial_player = cfg["game"]["player"]
         self.player = self.set_initial_player()
 
     def game_result(self):

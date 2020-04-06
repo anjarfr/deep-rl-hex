@@ -3,7 +3,7 @@ import numpy as np
 
 class Board:
     """
-    Superclass of board classes Triangle and Diamond
+    Superclass of board classes
     """
 
     def __init__(self, size):
@@ -59,54 +59,6 @@ class Board:
                     state += str(cell.state[1])
 
         return state
-
-
-class Triangle(Board):
-    """ Board class with triangular shape """
-
-    def __init__(self, size):
-        super(Triangle, self).__init__(size)
-
-    def create_board(self, size):
-        """ Creates a triangular board of the specified size """
-
-        cells = np.empty((size, size), dtype="object")
-        iterator = 1
-        while iterator != size + 1:
-            for row in range(size):
-                for col in range(iterator):
-                    cells[row][col] = Cell((0, 0), (row, col))
-                iterator += 1
-        return cells
-
-    def get_neighbors(self, r: int, c: int) -> list:
-
-        """ 
-        Finds the neighbors of the cell in (r, c)
-        and returns a list with their coordinates
-        """
-
-        tmp = [
-            (r - 1, c - 1),
-            (r - 1, c),
-            (r, c - 1),
-            (r, c + 1),
-            (r + 1, c),
-            (r + 1, c + 1),
-        ]
-        neighbors = []
-        for cell in tmp:
-            row = cell[0]
-            col = cell[1]
-            if self.is_legal_cell(row, col):
-                neighbors.append(cell)
-        return neighbors
-
-    def is_legal_cell(self, row: int, col: int) -> bool:
-        """ Checks if the cell in (row, col) is a valid one
-        e.g. it is not outside of the board """
-
-        return not (row < 0 or row > self.size - 1 or col < 0 or col > row)
 
 
 class Diamond(Board):

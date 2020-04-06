@@ -15,7 +15,7 @@ class MCTS:
         self.root = self.create_root_node(init_state)
         self.current_node = self.root
         self.simulations = simulations
-        self.c = cfg["mcts"]["c"]
+        self.c = cfg["agent"]["c"]
 
     def create_root_node(self, init_state):
         """ Initialize the root node."""

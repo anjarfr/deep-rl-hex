@@ -1,11 +1,11 @@
 from environment.board import Diamond
-from game import Game
+from environment.game import Game
 
 
 class Hex(Game):
 
-    def __init__(self, cfg):
-        super(Hex, self).__init__()
+    def __init__(self, cfg, verbose):
+        super(Hex, self).__init__(cfg, verbose)
         self.board = Diamond(self.size)
 
     def generate_initial_state(self, cfg):

@@ -1,6 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 
+
 class Visualizer:
     """ Creates a graphical representation of the game state """
 
@@ -11,11 +12,8 @@ class Visualizer:
 
         self.node_size = display_options["node_size"]
         self.initial_color = display_options["initial_color"]
-        self.filled_color = display_options["filled_color"]
-        self.start_color = display_options["jump_from_color"]
-        self.end_color = display_options["jump_to_color"]
-        self.start_size = display_options["jump_from_size"]
-        self.end_size = display_options["jump_to_size"]
+        self.p1_color = display_options["p1_color"]
+        self.p2_color = display_options["p2_color"]
         self.delay = display_options["delay"]
 
         self.nodes = self.get_nodes()
@@ -41,17 +39,10 @@ class Visualizer:
         positions = {}
         counter = 0
 
-        if self.shape == "triangle":
-            for i in range(self.size + 1):
-                for j in range(-i, i, 2):
-                    positions[self.nodes[counter]] = [self.size + j, self.size - i]
-                    counter += 1
-
-        if self.shape == "diamond":
-            for i in range(self.size, 0, -1):
-                for j in range(self.size):
-                    positions[self.nodes[counter]] = [i + j, i - j]
-                    counter += 1
+        for i in range(self.size, 0, -1):
+            for j in range(self.size):
+                positions[self.nodes[counter]] = [i + j, i - j]
+                counter += 1
 
         return positions
 

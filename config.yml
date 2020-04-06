@@ -8,7 +8,6 @@ game:
 
 display:
   node_size: 1500
-  new_piece_size: 3000
   initial_color: 'white'
   p1_color: 'plum'
   p2_color: 'orange'
