@@ -5,10 +5,9 @@ import matplotlib.pyplot as plt
 class Visualizer:
     """ Creates a graphical representation of the game state """
 
-    def __init__(self, board, size, shape, display_options):
+    def __init__(self, board, size, display_options):
         self.board = board
         self.size = size
-        self.shape = shape
 
         self.node_size = display_options["node_size"]
         self.initial_color = display_options["initial_color"]
