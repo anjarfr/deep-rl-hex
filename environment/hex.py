@@ -1,4 +1,5 @@
 from environment.board import Diamond
+from game import Game
 
 
 class Hex(Game):

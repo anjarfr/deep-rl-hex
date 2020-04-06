@@ -1,7 +1,6 @@
 from random import randint
 from copy import copy
 import random
-from board import Triangle, Diamond
 
 random.seed(1337)
 
