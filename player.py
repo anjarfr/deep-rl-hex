@@ -2,11 +2,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import yaml
 
-from Project1.agent.actor import Actor
-from Project1.agent import Critic
-from Project1.agent.torch_critic import NeuralNetCritic
-from Project1.environment import Peg, Hex
-from Project1.environment import Visualizer
+from agent.actor import Actor
+from agent import Critic
+from agent.torch_critic import NeuralNetCritic
+from environment import Peg, Hex
+from environment import Visualizer
 
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
