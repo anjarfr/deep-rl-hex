@@ -27,7 +27,7 @@ class Hex(Game):
         """
         pass
 
-    def perform_action(self, state, action: tuple):
+    def perform_action(self, action: tuple):
         """
         :return: new game state
         """
@@ -43,8 +43,8 @@ class Hex(Game):
 
         reward = 0
 
-        if self.is_finished():
-            reward = 1000
+        #if self.game_over():
+            #reward = 1000
 
         return reward
 

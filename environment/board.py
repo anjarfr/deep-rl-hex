@@ -26,15 +26,22 @@ class Board:
 
     def get_filled_cells(self):
         """ Returns a list with coordinates to
-        all non-empty cells in the board """
+        all non-empty cells in the board
+        Return two lists
+        """
 
-        filled = []
+        p1_filled = []
+        p2_filled = []
+
         for row in self.cells:
             for cell in row:
-                if cell != None:
-                    if cell.is_filled():
-                        filled.append(cell.coordinates)
-        return filled
+                if cell.is_filled():
+                    if cell.is_player1():
+                        p1_filled.append(cell.coordinates)
+                    else:
+                        p2_filled.append(cell.coordinates)
+
+        return p1_filled, p2_filled
 
     def get_open_cells(self):
         """ Returns a list with coordinates to
@@ -129,4 +136,7 @@ class Cell:
         """ Checks whether the cell is empty """
 
         return self.state != (0, 0)
+
+    def is_player1(self):
+        return self.state == (0, 1)
 

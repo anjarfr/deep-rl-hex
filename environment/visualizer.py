@@ -75,28 +75,28 @@ class Visualizer:
         G.add_edges_from(self.edges)
         return G
 
-    def fill_nodes(self, filled_nodes, jump_from=None, jump_to=None):
+    def fill_nodes(self, filled_nodes):
         """
         Takes in a list of node coordinates
         and colors them with the selected
         filled node color, and sets size.
         Display the new board state
         """
+
+        p1_filled_nodes = filled_nodes[0]
+        p2_filled_nodes = filled_nodes[1]
+
         self.node_colors = self.initialize_colors()
-        filled_indexes = [self.nodes.index(node) for node in filled_nodes]
         self.node_sizes = [self.node_size for i in range(len(self.nodes))]
 
-        for index in filled_indexes:
-            self.node_colors[index] = self.filled_color
+        p1_filled_indexes = [self.nodes.index(node) for node in p1_filled_nodes]
+        p2_filled_indexes = [self.nodes.index(node) for node in p2_filled_nodes]
 
-        if jump_from != None and jump_to != None:
-            start = self.nodes.index(jump_from)
-            end = self.nodes.index(jump_to)
-            self.node_colors[start] = self.start_color
-            self.node_colors[end] = self.end_color
+        for index in p1_filled_indexes:
+            self.node_colors[index] = self.p1_color
 
-            self.node_sizes[start] = self.start_size
-            self.node_sizes[end] = self.end_size
+        for index in p2_filled_indexes:
+            self.node_colors[index] = self.p2_color
 
         self.display_board()
 

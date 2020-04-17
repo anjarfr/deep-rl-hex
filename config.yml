@@ -9,8 +9,8 @@ game:
 display:
   node_size: 1500
   initial_color: 'white'
-  p1_color: 'plum'
-  p2_color: 'orange'
+  p1_color: 'lightsteelblue'
+  p2_color: 'darkseagreen'
   delay: 0.5 #seconds
   display_last_game: True # True or False
   plot_window_size: 20
