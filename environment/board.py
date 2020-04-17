@@ -67,6 +67,17 @@ class Board:
 
         return state
 
+    def get_edge_coords(self):
+        edge1, edge2, edge3, edge4 = set(), set(), set(), set()
+
+        for i in range(self.size):
+            edge1.add((i, 0))
+            edge2.add((self.size - 1, i))
+            edge3.add((0, i))
+            edge4.add((i, self.size - 1))
+
+        return [edge1, edge2, edge3, edge4]
+
 
 class Diamond(Board):
     """ Board class with diamond shape """
