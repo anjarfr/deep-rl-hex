@@ -29,9 +29,13 @@ class Hex(Game):
         """
         for path in self.paths:
             if path & self.edges[0] and path & self.edges[3]:
-                return True
+                if self.board.cells[path[0][0]][path[0][1]].state == (0, 1):
+                    return True
             elif path & self.edges[1] and path & self.edges[2]:
-                return True
+                coord = next(iter(path))
+                r, c = coord[0], coord[1]
+                if self.board.cells[path[0][0]][path[0][1]].state == (1, 0):
+                    return True
         return False
 
     def add_to_path(self, r, c, state):
