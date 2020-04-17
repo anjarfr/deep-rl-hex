@@ -21,7 +21,7 @@ agent:
   c: 1 # exploration constant
   episodes: 200 # number of episodes
   simulations: 500 # number of simulations (and hence rollouts) per actual game move
-  m: 5 # number of ANETs to be cached for playing TOPP
+  m: 50 # interval of ANETs to be cached for playing TOPP
   g: 10 # number of games played in TOPP
 
 nn:

@@ -1,4 +1,4 @@
-from node import Node
+from agent.node import Node
 import random
 
 random.seed(2020)
