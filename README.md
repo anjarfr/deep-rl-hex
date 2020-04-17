@@ -1,9 +1,10 @@
 # On-Policy Monte Carlo Tree Search for Game Playing
 
 ## TODO
-- [ ] Hex logikk 
-- [ ] ANET 
-- [ ] RBUF 
+- [ ] Hex logikk
+- [ ] Visualisere boardet
+- [ ] ANET - fjerne eligibilities
+- [ ] RBUF
 - [ ] Finne ut hvordan illegal moves settes til 0 
 - [ ] Implementere e-greedy 
 - [ ] Litt randomness på target policy også (sigma)  

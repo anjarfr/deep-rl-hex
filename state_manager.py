@@ -189,7 +189,8 @@ class StateManager:
 
 def main():
     player = StateManager()
-    player.play_game()
+    #player.play_game()
+    player.
 
 
 if __name__ == "__main__":
