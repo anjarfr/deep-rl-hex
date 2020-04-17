@@ -7,7 +7,7 @@ class Hex(Game):
     def __init__(self, cfg, verbose):
         super(Hex, self).__init__(cfg, verbose)
         self.board = Diamond(self.size)
-        self.edges = self.get_edge_coords()
+        self.edges = self.board.get_edge_coords()
         self.paths = []
 
     def generate_initial_state(self, cfg):
@@ -51,17 +51,6 @@ class Hex(Game):
         if not prev_path:
             newset = {(r, c)}
             self.paths.append(newset)
-
-    def get_edge_coords(self):
-        """
-        """
-        edge1, edge2, edge3, edge4 = set(), set(), set(), set()
-        for i in range(self.size):
-            edge1.add((i, 0))
-            edge2.add((self.size-1, i))
-            edge3.add((0, i))
-            edge4.add((i, self.size-1))
-        return [edge1, edge2, edge3, edge4]
 
     def perform_action(self, action: tuple):
         """

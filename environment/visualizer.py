@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 
 class Visualizer:
+
     """ Creates a graphical representation of the game state """
 
     def __init__(self, board, size, display_options):
@@ -14,6 +15,7 @@ class Visualizer:
         self.p1_color = display_options["p1_color"]
         self.p2_color = display_options["p2_color"]
         self.delay = display_options["delay"]
+        self.initial_edge_color = display_options["edge_color"]
 
         self.nodes = self.get_nodes()
         self.positions = self.get_positions()
@@ -21,6 +23,7 @@ class Visualizer:
         self.node_colors = self.initialize_colors()
         self.node_sizes = self.node_size
         self.graph = self.initialize_graph()
+        self.edge_colors = self.get_edge_colors()
 
     def get_nodes(self):
         """ Get the coordinates of all the cells on the board """
@@ -57,14 +60,21 @@ class Visualizer:
 
         for node in self.nodes:
             neighbors = self.board.get_neighbors(node[0], node[1])
-            edges += [(node, neighbor) for neighbor in neighbors]
+
+            for neighbor in neighbors:
+                if (node, neighbor) and (neighbor, node) not in edges:
+                    edges.append((node, neighbor))
 
         return edges
 
     def initialize_colors(self):
         """ Set all nodes to an initial color """
 
-        return [self.initial_color for i in range(len(self.nodes))]
+        return [self.initial_color for _ in range(len(self.nodes))]
+
+    def initialize_edge_colors(self):
+        """ Set all edges to initial color """
+        return [self.initial_edge_color for _ in range(len(self.edges))]
 
     def initialize_graph(self):
         """ Used to create a graph object during initialization
@@ -100,6 +110,35 @@ class Visualizer:
 
         self.display_board()
 
+    def get_edge_colors(self):
+        """ Set the outer edges to the color of the player that owns the edge """
+        edge_colors = self.initialize_edge_colors()
+        outer_edges = list(self.board.get_edge_coords())
+        outer_edges_coord = []
+
+        for i in range(len(outer_edges)):
+            edges = sorted(list(outer_edges[i]))
+            temp_list = []
+            for j in range(len(edges) - 1):
+                temp_list.append((edges[j], edges[j + 1]))
+
+            outer_edges_coord.append(temp_list)
+
+        for j in range(len(outer_edges_coord)):
+            edge_list = outer_edges_coord[j]
+
+            for edge in edge_list:
+                edge_colors[self.edges.index(edge)] = self.player_color(j)
+
+        return edge_colors
+
+    def player_color(self, i):
+        """ Return the color of player based on index (this is a bit hardcoded) """
+        if i == 0 or i == 3:
+            return self.p1_color
+        else:
+            return self.p2_color
+
     def display_board(self):
         """ Displays the board """
 
@@ -111,9 +150,10 @@ class Visualizer:
             node_color=self.node_colors,
             node_size=self.node_sizes,
             edgecolors="black",
+            edge_color=self.edge_colors,
+            width=3
         )
 
         plt.axis("off")
         plt.show()
         plt.pause(self.delay)
-
