@@ -7,6 +7,8 @@ class Hex(Game):
     def __init__(self, cfg, verbose):
         super(Hex, self).__init__(cfg, verbose)
         self.board = Diamond(self.size)
+        self.p1_edge, self.p2_edge = self.get_edge_coord()
+        self.paths = []
 
     def generate_initial_state(self, cfg):
         """
@@ -25,7 +27,39 @@ class Hex(Game):
         """
         :return: boolean
         """
-        pass
+        filled = self.board.get_filled_cells()
+        for e in self.p1_edge:
+            if self.path_is_complete(r, c):
+                return True
+        return False
+
+    def search_path(self, r, c, path):
+        state = self.board[r][c]
+        neighbors = self.board.get_neighbors(r, c)
+        for n in neighbors:
+            r, c = n[0], n[1]
+            if self.board[r][c].state == state:
+                path.append((r,c))
+                path = search_path(r, c, path)
+        return path
+
+    def path_is_complete(r, c):
+        path = self.search_path(r, c, [(r, c)])
+        if path[0] in self.p1_edge and path[-1] in p2_edge:
+            return True
+        return False
+
+    def get_edge_coord():
+        """
+        """
+        p1_coord = []
+        p2_coord = []
+        for i in range(self.size):
+            p1_coord.append((i,0))
+            p1_coord.append((self.size, i))
+            p2_coord.append((0,i))
+            p2_coord.append((i, self.size))
+        return p1_coord, p2_coord
 
     def perform_action(self, state, action: tuple):
         """
@@ -35,15 +69,15 @@ class Hex(Game):
         col = action[1]
 
         if self.player == 1:
-            filling = (0, 1)
+            state = (0, 1)
         elif self.player == 2:
-            filling = (1, 0)
+            state = (1, 0)
 
-        self.board.set_cell(row, col, filling)
+        self.board.set_cell(row, col, state)
 
         reward = 0
 
-        if self.is_finished():
+        if self.game_over():
             reward = 1000
 
         return reward
