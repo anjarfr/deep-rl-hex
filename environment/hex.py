@@ -7,7 +7,7 @@ class Hex(Game):
     def __init__(self, cfg, verbose):
         super(Hex, self).__init__(cfg, verbose)
         self.board = Diamond(self.size)
-        self.p1_edge, self.p2_edge = self.get_edge_coord()
+        self.edges = self.get_edge_coords()
         self.paths = []
 
     def generate_initial_state(self, cfg):
@@ -23,47 +23,49 @@ class Hex(Game):
         """
         return self.board.get_open_cells()
 
-    def game_over(self, state):
+    def game_over(self):
         """
         :return: boolean
         """
-        filled = self.board.get_filled_cells()
-        for e in self.p1_edge:
-            if self.path_is_complete(r, c):
+        for path in self.paths:
+            if path & self.edges[0] and path & self.edges[3]:
+                return True
+            elif path & self.edges[1] and path & self.edges[2]:
                 return True
         return False
 
-    def search_path(self, r, c, path):
-        state = self.board[r][c]
+    def add_to_path(self, r, c, state):
+        state = self.board.cells[r][c].state
         neighbors = self.board.get_neighbors(r, c)
+        prev_path = None
         for n in neighbors:
-            r, c = n[0], n[1]
-            if self.board[r][c].state == state:
-                path.append((r,c))
-                path = search_path(r, c, path)
-        return path
+            r_n, c_n = n[0], n[1]
+            if self.board.cells[r_n][c_n].state == state:
+                for path in self.paths:
+                    if n in path:
+                        if prev_path:
+                            path.update(prev_path)
+                        else:
+                            path.add((r, c))
+                        prev_path = path
+        if not prev_path:
+            newset = {(r, c)}
+            self.paths.append(newset)
 
-    def path_is_complete(r, c):
-        path = self.search_path(r, c, [(r, c)])
-        if path[0] in self.p1_edge and path[-1] in p2_edge:
-            return True
-        return False
-
-    def get_edge_coord():
+    def get_edge_coords(self):
         """
         """
-        p1_coord = []
-        p2_coord = []
+        edge1, edge2, edge3, edge4 = set(), set(), set(), set()
         for i in range(self.size):
-            p1_coord.append((i,0))
-            p1_coord.append((self.size, i))
-            p2_coord.append((0,i))
-            p2_coord.append((i, self.size))
-        return p1_coord, p2_coord
+            edge1.add((i, 0))
+            edge2.add((self.size-1, i))
+            edge3.add((0, i))
+            edge4.add((i, self.size-1))
+        return [edge1, edge2, edge3, edge4]
 
-    def perform_action(self, state, action: tuple):
+    def perform_action(self, action: tuple):
         """
-        :return: new game state
+        :return: reward for new state
         """
         row = action[0]
         col = action[1]
@@ -74,12 +76,14 @@ class Hex(Game):
             state = (1, 0)
 
         self.board.set_cell(row, col, state)
+        self.add_to_path(row, col, state)
 
         reward = 0
 
         if self.game_over():
             reward = 1000
 
+        print(reward)
         return reward
 
     def generate_child_states(self, state):
