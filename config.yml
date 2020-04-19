@@ -9,6 +9,7 @@ game:
 display:
   node_size: 1500
   initial_color: 'white'
+  edge_color: 'darkgrey'
   p1_color: 'lightsteelblue'
   p2_color: 'darkseagreen'
   delay: 0.5 #seconds
