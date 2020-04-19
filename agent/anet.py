@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import yaml
+import random
 
 
 class ANET:
@@ -26,6 +27,17 @@ class ANET:
         normalized = [float(i)/total for i in remove_illegal]
 
         return normalized
+
+    def choose_action(self, prediction, legal, epsilon):
+        """ Returns index of chosen action
+        """
+        normalized_predictions = self.re_normalize(prediction, legal)
+
+        if random.uniform(0, 1) < epsilon:
+            return random.randrange(len(normalized_predictions))
+
+        else:
+            return normalized_predictions.index(max(normalized_predictions))
 
 
 class NeuralNet(nn.Module):
