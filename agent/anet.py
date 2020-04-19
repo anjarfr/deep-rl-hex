@@ -12,8 +12,8 @@ class ANET:
     def predict(self):
         return self.model()
 
-    def train(self, target):
-        prediction = self.model()
+    def train(self, state, target):
+        prediction = self.model(state)
         self.model.update(prediction, target)
 
     def re_normalize(self, prediction, legal):
@@ -64,7 +64,7 @@ class NeuralNet(nn.Module):
             layers.append(layers.append(nn.Linear(input_size, output_size)))
 
         self.layers = nn.ModuleList(layers)
-        self.layers.apply(init_weights)
+        # self.layers.apply(init_weights)
 
     def update(self, prediction, target):
         """ Update the gradients based on loss """
