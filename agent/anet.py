@@ -48,14 +48,14 @@ class NeuralNet(nn.Module):
             layers.append(nn.Linear(self.dimensions[-1], output_size))
             layers.append(nn.Softmax(dim=1))
         else:
-            layers.append(layers.append(nn.Linear(input_size, output_size)))
+            layers.append(nn.Linear(input_size, output_size))
             layers.append(nn.Softmax(dim=1))
 
         self.model = nn.Sequential(*layers)
-        self.model.apply(init_weights)
+        self.model.apply(self.init_weights)
 
-        self.optimizer = self.get_optimizer(cfg["nn"]["optimizer"],
-                                            list(self.model.parameters()))
+        self.optimizer = self.get_optimizer(
+            cfg["nn"]["optimizer"], list(self.model.parameters()))
         self.loss_func = nn.CrossEntropyLoss()
 
     def update(self, prediction, target):
@@ -67,7 +67,7 @@ class NeuralNet(nn.Module):
 
     def init_weights(self, m):
         if type(m) == nn.Linear:
-            torch.nn.init.xavier_uniform(m.weight)
+            torch.nn.init.xavier_uniform_(m.weight)
             m.bias.data.fill_(0.01)
 
     def get_activation(self, activation):
@@ -80,12 +80,12 @@ class NeuralNet(nn.Module):
         return activations[activation]
 
     def get_optimizer(self, optimizer, parameters):
-        optimizers = nn.ModuleDict({
+        optimizers = {
             'adagrad': optim.Adagrad(parameters, self.learning_rate),
             'adam': optim.Adam(parameters, self.learning_rate),
             'sgd': optim.SGD(parameters, self.learning_rate),
             'rmsprop': optim.RMSprop(parameters, self.learning_rate),
-        })
+        }
         return optimizers[optimizer]
 
 
@@ -93,3 +93,4 @@ with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
 net = ANET(cfg)
+print(net.model)
