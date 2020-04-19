@@ -44,7 +44,7 @@ class NeuralNet(nn.Module):
             for i in range(len(self.dimensions) - 2):
                 layers.append(
                     nn.Linear(self.dimensions[i], self.dimensions[i+1]))
-                layers.append(self.activation()) if self.activation else None
+                layers.append(self.activation) if self.activation else None
             layers.append(nn.Linear(self.dimensions[-1], output_size))
             layers.append(nn.Softmax(dim=1))
         else:
