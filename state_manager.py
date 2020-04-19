@@ -14,6 +14,7 @@ with open("config.yml", "r") as ymlfile:
 
 PATH = './models/'
 
+
 class StateManager:
 
     def __init__(self):
@@ -34,13 +35,12 @@ class StateManager:
 
         self.mcts = MCTS(cfg, self.sim_game, self.state, self.simulations)
         self.visualizer = Visualizer(self.game.board, self.game.size, cfg["display"])
-        self.buffer = ReplayBuffer()
+        self.replay_buffer = ReplayBuffer()
 
         # Initialize ANET with small weights and biases
         self.ANET = ANET()
 
     def store_net(self):
-        
         self.ANET.save()
 
     def play_game(self):
@@ -51,10 +51,22 @@ class StateManager:
             while not self.game.game_over():
 
                 """ Do simulations and choose best action """
-                action = self.mcts.uct_search(self.game.player)
+                distribution, action = self.mcts.uct_search(self.game.player)
+
+                self.replay_buffer.add(self.state, distribution)
                 self.state = self.game.perform_action(self.state, action)
 
-            # Reset game
+            """ Train ANET """
+            minibatch = self.replay_buffer.create_minibatch()
+            train_states = [case[0] for case in minibatch]
+            train_targets = [case[1] for case in minibatch]
+            self.ANET.train(train_states, train_targets)
+
+            """ Save model parameters """
+            if i % self.anet_interval == 0:
+                self.store_net()
+
+            """ Reset game """
             self.mcts.reset(deepcopy(self.initial_state))
             self.state = deepcopy(self.initial_state)
             self.game.player = self.game.set_initial_player()

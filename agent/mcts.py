@@ -26,6 +26,8 @@ class MCTS:
         """ Simulations for one move by one player in the game
         Return the child with highest score as action """
 
+        # TODO change to return distribution as well as of action
+
         for i in range(self.simulations):
             self.game.set_player(player)
             self.current_node = self.root
@@ -36,8 +38,10 @@ class MCTS:
 
         #self.root.print_tree()
 
+        distribution = self.get_probability_distribution()
         self.root = the_chosen_one
-        return the_chosen_one.action
+
+        return distribution, the_chosen_one.action
 
     def simulate(self):
         """ Use tree search to find current simulation root
@@ -168,6 +172,12 @@ class MCTS:
         for node in path:
             node.visits += 1
             node.avg_wins += z
+
+    def get_probability_distribution(self):
+        """ Return distribution between child nodes from current root"""
+        self.current_node
+
+        return distribution
 
     def reset(self, init_state):
         self.root = self.create_root_node(init_state)
