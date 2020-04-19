@@ -8,6 +8,9 @@ class ANET:
     def __init__(self, cfg):
         self.board_size = cfg[]
         self.model = NeuralNet(cfg, board_size)
+    
+    def predict(self):
+        return self.model()
 
     def train(self, target):
         prediction = self.model()
