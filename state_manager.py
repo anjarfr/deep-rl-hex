@@ -6,6 +6,8 @@ from copy import deepcopy
 from environment.hex import Hex
 from environment.visualizer import Visualizer
 from agent.mcts import MCTS
+from agent.buffer import ReplayBuffer
+from agent.anet import ANET
 
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
@@ -31,8 +33,10 @@ class StateManager:
 
         self.mcts = MCTS(cfg, self.sim_game, self.state, self.simulations)
         self.visualizer = Visualizer(self.game.board, self.game.size, cfg["display"])
+        self.buffer = ReplayBuffer()
+
         # Initialize ANET with small weights and biases
-        self.replay_buffer = []
+        self.ANET = ANET()
 
     def play_game(self):
 

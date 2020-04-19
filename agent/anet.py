@@ -8,13 +8,18 @@ class ANET:
     def __init__(self, cfg):
         self.board_size = cfg[]
         self.model = NeuralNet(cfg, board_size)
-    
+
     def predict(self):
         return self.model()
 
     def train(self, target):
         prediction = self.model()
         self.model.update(prediction, target)
+
+    def re_normalize(self, prediction, legal):
+        """ Sets all illegal moves to 0 and renormalizes the 
+        distribution """
+        pass
 
 
 class NeuralNet(nn.Module):
@@ -44,18 +49,22 @@ class NeuralNet(nn.Module):
         self.activation = cfg["nn"]["activation_hidden"]
         self.optimizer = self.optimizers[cfg["nn"]["optimizer"]]
 
-        input_size = 2*k**2 + 2  # 2kÂ² + player
+        input_size = 2*k**2 + 2  # 2k² + player
         output_size = k**2
 
         layers = []
-        layers.append(nn.Linear(input_size, self.dimensions[0]))
 
-        for i in range(len(self.dimensions) - 2):
-            layers.append(nn.Linear(self.dimensions[i], self.dimensions[i+1]))
-
-        layers.append(nn.Linear(self.dimensions[-1], output_size))
+        if len(self.dimensions):
+            layers.append(nn.Linear(input_size, self.dimensions[0]))
+            for i in range(len(self.dimensions) - 2):
+                layers.append(
+                    nn.Linear(self.dimensions[i], self.dimensions[i+1]))
+            layers.append(nn.Linear(self.dimensions[-1], output_size))
+        else:
+            layers.append(layers.append(nn.Linear(input_size, output_size)))
 
         self.layers = nn.ModuleList(layers)
+        self.layers.apply(init_weights)
 
     def update(self, prediction, target):
         """ Update the gradients based on loss """
@@ -70,3 +79,8 @@ class NeuralNet(nn.Module):
             x = self.activations[self.activation](layer(x))
         x = torch.softmax(self.layers[-1](x))
         return x
+
+    def init_weights(self, m):
+        if type(m) == nn.Linear:
+            torch.nn.init.xavier_uniform(m.weight)
+            m.bias.data.fill_(0.01)
