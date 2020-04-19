@@ -6,8 +6,8 @@ import torch.optim as optim
 class ANET:
 
     def __init__(self, cfg):
-        self.board_size = cfg[]
-        self.model = NeuralNet(cfg, board_size)
+        self.board_size = cfg["board_size"]
+        self.model = NeuralNet(cfg, self.board_size)
 
     def predict(self):
         return self.model()
@@ -19,7 +19,12 @@ class ANET:
     def re_normalize(self, prediction, legal):
         """ Sets all illegal moves to 0 and renormalizes the 
         distribution """
-        pass
+
+        remove_illegal = [a*b for a, b in zip(prediction, legal)]   # now illegal actions should be set to 0
+        total = sum(remove_illegal)
+        normalized = [float(i)/total for i in remove_illegal]
+
+        return normalized
 
 
 class NeuralNet(nn.Module):
@@ -49,7 +54,7 @@ class NeuralNet(nn.Module):
         self.activation = cfg["nn"]["activation_hidden"]
         self.optimizer = self.optimizers[cfg["nn"]["optimizer"]]
 
-        input_size = 2*k**2 + 2  # 2k² + player
+        input_size = 2*k**2 + 2  # 2k^2 + player
         output_size = k**2
 
         layers = []
@@ -71,7 +76,7 @@ class NeuralNet(nn.Module):
         loss = self.loss_func(prediction, target)
         self.optimizer.zero_grad()  # Clears gradients
         loss.backward()
-        optimizer.step()
+        self.optimizer.step()
 
     def forward(self, x):
         """ Compute value of state x """
