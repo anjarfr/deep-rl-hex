@@ -31,6 +31,9 @@ class ANET:
     def choose_action(self, prediction, legal, epsilon):
         """ Returns index of chosen action
         """
+
+        # TODO Must be called from somewhere, maybe in MCTS after prediction has been made in ANET, or in ANET
+
         normalized_predictions = self.re_normalize(prediction, legal)
 
         if random.uniform(0, 1) < epsilon:

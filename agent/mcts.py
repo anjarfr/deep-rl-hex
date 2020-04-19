@@ -174,10 +174,31 @@ class MCTS:
             node.avg_wins += z
 
     def get_probability_distribution(self):
-        """ Return distribution between child nodes from current root"""
-        self.current_node
+        """ Return distribution child node visit counts from current root"""
 
-        return distribution
+        dist_length = self.game.size ** 2
+        distribution = [0] * dist_length
+
+        # Must somehow know which index corresponds to each action
+        children = self.root.children
+        valid_actions = self.root.children.keys()
+        all_actions = self.game.board.get_cell_coord()
+
+        for action in valid_actions:
+            child = children.get(action)
+            visit_count = child.visits
+            action_index = all_actions.index(action)
+
+            distribution[action_index] = visit_count
+
+        normalized_distribution = self.normalize_distribution(distribution)
+        return normalized_distribution
+
+    def normalize_distribution(self, distribution):
+        total = sum(distribution)
+        normalized_distribution = [float(pred) / total for pred in distribution]
+
+        return normalized_distribution
 
     def reset(self, init_state):
         self.root = self.create_root_node(init_state)
