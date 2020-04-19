@@ -30,7 +30,7 @@ nn:
   epsilon: 1
   epsilon_decay: 0.99
   dimensions: [25, 35, 10, 25] # Number of nodes in each layer
-  activation_hidden: 'Tanh' # Choose between 'Linear', 'Sigmoid', 'Tanh' and 'ReLu'
-  activation_output: 'Softmax'
-  optimizer: 'Adam' # Choose between 'Adagrad', 'SGD', 'RMSprop' and 'Adam'
+  activation_hidden: 'tanh' # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
+  activation_output: 'softmax'
+  optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
   loss: 'CrossEntropyLoss'

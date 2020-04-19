@@ -12,6 +12,7 @@ from agent.anet import ANET
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
+PATH = './models/'
 
 class StateManager:
 
@@ -37,6 +38,10 @@ class StateManager:
 
         # Initialize ANET with small weights and biases
         self.ANET = ANET()
+
+    def store_net(self):
+        
+        self.ANET.save()
 
     def play_game(self):
 

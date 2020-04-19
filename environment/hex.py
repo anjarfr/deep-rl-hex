@@ -56,7 +56,7 @@ class Hex(Game):
             newset = {(r, c)}
             self.paths.append(newset)
 
-    def perform_action(self, action: tuple):
+    def perform_action(self, state, action: tuple):
         """
         :return: reward for new state
         """
@@ -64,16 +64,16 @@ class Hex(Game):
         col = action[1]
 
         if self.player == 1:
-            state = (0, 1)
+            fill = (0, 1)
         elif self.player == 2:
-            state = (1, 0)
+            fill = (1, 0)
 
-        self.board.set_cell(row, col, state)
-        self.add_to_path(row, col, state)
+        state.set_cell(row, col, fill)
+        self.add_to_path(row, col, fill)
 
         reward = 0
 
-        if self.game_over():
+        if self.game_over(state):
             reward = 1000
 
         print(reward)
