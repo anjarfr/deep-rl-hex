@@ -1,51 +1,62 @@
 from environment.board import Diamond
 from environment.game import Game
+from copy import deepcopy
 
 
 class Hex(Game):
 
     def __init__(self, cfg, verbose):
         super(Hex, self).__init__(cfg, verbose)
-        self.board = Diamond(self.size)
-        self.edges = self.board.get_edge_coords()
-        self.paths = []
 
     def generate_initial_state(self, cfg):
         """
         :return: state of the initial game, as stated in configuration file
         """
-        pass
+        return Diamond(self.size)
 
-    def get_legal_actions(self, state):
+    def get_legal_actions(self, board):
         """
-        :param state: current state
+        :param board: current state
         :return: list of legal actions from given state
         """
-        return self.board.get_open_cells()
+        return board.get_open_cells()
 
-    def game_over(self):
+    def game_over(self, board):
         """
         :return: boolean
         """
-        for path in self.paths:
-            if path & self.edges[0] and path & self.edges[3]:
-                if self.board.cells[path[0][0]][path[0][1]].state == (0, 1):
+        edges = board.get_edge_coords()
+        paths = self.depth_first_search(board)
+        for path in paths:
+            coord = next(iter(path))
+            r, c = coord[0], coord[1]
+            if path & edges[0] and path & edges[3]:
+                if board.cells[r][c].state == (0, 1):
+                    print("1 wins")
                     return True
-            elif path & self.edges[1] and path & self.edges[2]:
-                coord = next(iter(path))
-                r, c = coord[0], coord[1]
-                if self.board.cells[path[0][0]][path[0][1]].state == (1, 0):
+            elif path & edges[1] and path & edges[2]:
+                if board.cells[r][c].state == (1, 0):
                     return True
         return False
 
-    def add_to_path(self, r, c, state):
-        state = self.board.cells[r][c].state
-        neighbors = self.board.get_neighbors(r, c)
+    def depth_first_search(self, board):
+        paths = []
+        for row in board.cells:
+            for cell in row:
+                if cell.is_filled():
+                    paths = self.add_to_path(
+                        cell.coordinates[0], cell.coordinates[1], board, paths)
+        return paths
+
+    def add_to_path(self, r, c, board, paths):
+        fill = board.cells[r][c].state
+        neighbors = board.get_neighbors(r, c)
         prev_path = None
         for n in neighbors:
             r_n, c_n = n[0], n[1]
-            if self.board.cells[r_n][c_n].state == state:
-                for path in self.paths:
+            cell = board.cells[r_n][c_n]
+            if cell.state == fill:
+                for path in paths:
                     if n in path:
                         if prev_path:
                             path.update(prev_path)
@@ -54,9 +65,10 @@ class Hex(Game):
                         prev_path = path
         if not prev_path:
             newset = {(r, c)}
-            self.paths.append(newset)
+            paths.append(newset)
+        return paths
 
-    def perform_action(self, state, action: tuple):
+    def perform_action(self, board, action: tuple):
         """
         :return: reward for new state
         """
@@ -68,21 +80,19 @@ class Hex(Game):
         elif self.player == 2:
             fill = (1, 0)
 
-        state.set_cell(row, col, fill)
-        self.add_to_path(row, col, fill)
+        board.set_cell(row, col, fill)
+        return board
 
-        reward = 0
-
-        if self.game_over(state):
-            reward = 1000
-
-        print(reward)
-        return reward
-
-    def generate_child_states(self, state):
+    def generate_child_states(self, board):
         """
         :return: List containing tuples with all child states of given state
                  and the action taken from state to child state
                  [(child state, action to child state)]
         """
-        pass
+        children = []
+        legal = self.get_legal_actions(board)
+        for action in legal:
+            child_state = deepcopy(board)
+            child_state = self.perform_action(child_state, action)
+            children.append((child_state, action))
+        return children
