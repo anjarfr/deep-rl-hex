@@ -18,4 +18,4 @@ class ReplayBuffer:
         self.buffer.append((s, D))
 
     def create_minibatch(self):
-        return sample(self.buffer, 50)
+        return sample(self.buffer, min(50, len(self.buffer)//4))

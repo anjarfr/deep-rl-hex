@@ -12,7 +12,9 @@ class Hex(Game):
         """
         :return: state of the initial game, as stated in configuration file
         """
-        return Diamond(self.size)
+        board = Diamond(self.size)
+        self.edges = board.get_edge_coords()
+        return board
 
     def get_legal_actions(self, board):
         """
@@ -25,16 +27,16 @@ class Hex(Game):
         """
         :return: boolean
         """
-        edges = board.get_edge_coords()
+        if not len(self.get_legal_actions(board)):
+            return True
         paths = self.depth_first_search(board)
         for path in paths:
             coord = next(iter(path))
             r, c = coord[0], coord[1]
-            if path & edges[0] and path & edges[3]:
+            if path & self.edges[0] and path & self.edges[3]:
                 if board.cells[r][c].state == (0, 1):
-                    print("1 wins")
                     return True
-            elif path & edges[1] and path & edges[2]:
+            elif path & self.edges[1] and path & self.edges[2]:
                 if board.cells[r][c].state == (1, 0):
                     return True
         return False
