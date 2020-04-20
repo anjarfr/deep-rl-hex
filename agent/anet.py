@@ -38,11 +38,11 @@ class ANET:
 
     def save(self, i):
         torch.save(
-            self.model, '../models/ANET_{}_size_{}'.format(i, self.board_size))
+            self.model.state_dict(), 'models/ANET_{}_size_{}.pth'.format(i, self.board_size))
 
     def load(self, i):
-        self.model = torch.load(
-            '../models/ANET_{}_{}'.format(i, self.board_size))
+        self.model.load_state_dict(torch.load(
+            'models/ANET_{}_size_{}.pth'.format(i, self.board_size)))
         self.model.eval()
 
 
