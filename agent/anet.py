@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import yaml
+import random
 
 
 class ANET:
@@ -10,8 +11,8 @@ class ANET:
         self.board_size = cfg["game"]["board_size"]
         self.model = NeuralNet(cfg, self.board_size)
 
-    def predict(self):
-        return self.model()
+    def predict(self, state):
+        return self.model(state)
 
     def train(self, state, target):
         prediction = self.model(state)
@@ -29,10 +30,10 @@ class ANET:
         """ Returns index of chosen action
         """
         # TODO Must be called from somewhere, maybe in MCTS after prediction has been made in ANET, or in ANET
-        normalized_predictions = self.re_normalize(prediction, legal)
         if random.uniform(0, 1) < epsilon:
             return legal[random.randrange(len(legal))]
         else:
+            normalized_predictions = self.re_normalize(prediction, legal)
             return normalized_predictions.index(max(normalized_predictions))
 
     def save(self, i):
@@ -55,7 +56,7 @@ class NeuralNet(nn.Module):
         self.learning_rate = cfg["nn"]["learning_rate"]
         self.activation = self.get_activation(cfg["nn"]["activation_hidden"])
 
-        input_size = 2*k**2 + 2  # 2k**2 + player
+        input_size = 2*k**2 + 2
         output_size = k**2
 
         layers = []
@@ -63,7 +64,7 @@ class NeuralNet(nn.Module):
         if len(self.dimensions):
             layers.append(nn.Linear(input_size, self.dimensions[0]))
             layers.append(self.activation) if self.activation else None
-            for i in range(len(self.dimensions) - 2):
+            for i in range(len(self.dimensions) - 1):
                 layers.append(
                     nn.Linear(self.dimensions[i], self.dimensions[i+1]))
                 layers.append(self.activation) if self.activation else None
