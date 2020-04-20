@@ -40,9 +40,6 @@ class StateManager:
         # Initialize ANET with small weights and biases
         self.ANET = ANET()
 
-    def store_net(self):
-        self.ANET.save()
-
     def play_game(self):
 
         """ One complete game """

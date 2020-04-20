@@ -21,27 +21,29 @@ class ANET:
     def re_normalize(self, prediction, legal):
         """ Sets all illegal moves to 0 and renormalizes the 
         distribution """
-
-        # now illegal actions should be set to 0
         remove_illegal = [a*b for a, b in zip(prediction, legal)]
         total = sum(remove_illegal)
         normalized = [float(i)/total for i in remove_illegal]
-
         return normalized
 
     def choose_action(self, prediction, legal, epsilon):
         """ Returns index of chosen action
         """
-
         # TODO Must be called from somewhere, maybe in MCTS after prediction has been made in ANET, or in ANET
-
-        normalized_predictions = self.re_normalize(prediction, legal)
-
         if random.uniform(0, 1) < epsilon:
-            return random.randrange(len(normalized_predictions))
-
+            return legal[random.randrange(len(legal))]
         else:
+            normalized_predictions = self.re_normalize(prediction, legal)
             return normalized_predictions.index(max(normalized_predictions))
+
+    def save(self, i):
+        torch.save(
+            self.model.state_dict(), 'models/ANET_{}_size_{}.pth'.format(i, self.board_size))
+
+    def load(self, i):
+        self.model.load_state_dict(torch.load(
+            'models/ANET_{}_size_{}.pth'.format(i, self.board_size)))
+        self.model.eval()
 
 
 class NeuralNet(nn.Module):
@@ -108,10 +110,3 @@ class NeuralNet(nn.Module):
             'rmsprop': optim.RMSprop(parameters, self.learning_rate),
         }
         return optimizers[optimizer]
-
-
-with open("config.yml", "r") as ymlfile:
-    cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-
-net = ANET(cfg)
-print(net.model)
