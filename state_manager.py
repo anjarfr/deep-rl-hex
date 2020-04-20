@@ -12,8 +12,6 @@ from agent.anet import ANET
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
-PATH = './models/'
-
 
 class StateManager:
 
@@ -26,6 +24,7 @@ class StateManager:
         self.anet_interval = cfg["agent"]["m"]
         self.TOPP_games = cfg["agent"]["g"]
         self.display_last_game = cfg["display"]["display_last_game"]
+        self.save_interval = cfg["nn"]["save_interval"]
 
         self.game = Hex(cfg, self.verbose)
         self.initial_state = self.game.generate_initial_state(cfg)
@@ -34,14 +33,14 @@ class StateManager:
         self.state = deepcopy(self.initial_state)
 
         self.mcts = MCTS(cfg, self.sim_game, self.state, self.simulations)
-        self.visualizer = Visualizer(self.game.board, self.game.size, cfg["display"])
+        self.visualizer = Visualizer(
+            self.game.board, self.game.size, cfg["display"])
         self.replay_buffer = ReplayBuffer()
 
         # Initialize ANET with small weights and biases
         self.ANET = ANET()
 
     def play_game(self):
-
         """ One complete game """
         for i in range(self.episodes):
 
@@ -60,8 +59,8 @@ class StateManager:
             self.ANET.train(train_states, train_targets)
 
             """ Save model parameters """
-            if i % self.anet_interval == 0:
-                self.store_net()
+            if i % self.save_interval == 0:
+                self.ANET.save(i)
 
             """ Reset game """
             self.mcts.reset(deepcopy(self.initial_state))
