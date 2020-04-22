@@ -2,16 +2,19 @@ import numpy as np
 
 
 class Board:
-    """
-    Superclass of board classes
-    """
 
     def __init__(self, size):
         self.size = size
         self.cells = self.create_board(self.size)
 
     def create_board(self, size):
-        pass
+        """ Creates a diamond board of the specified size """
+
+        cells = np.empty((size, size), dtype="object")
+        for row in range(size):
+            for col in range(size):
+                cells[row][col] = Cell((0, 0), (row, col))
+        return cells
 
     def set_cell(self, r, c, state):
         """ Sets the state of cell in (r, c) to state """
@@ -27,9 +30,8 @@ class Board:
     def get_filled_cells(self):
         """ Returns a list with coordinates to
         all non-empty cells in the board
-        Return two lists
+        Return two lists, one for player 1 and one for player 2
         """
-
         p1_filled = []
         p2_filled = []
 
@@ -55,18 +57,6 @@ class Board:
                         open_cells.append(cell.coordinates)
         return open_cells
 
-    def generate_state(self):
-        """ Creates a string with board state """
-
-        state = ""
-        for row in self.cells:
-            for cell in row:
-                if cell != None:
-                    state += str(cell.state[0])
-                    state += str(cell.state[1])
-
-        return state
-
     def get_edge_coords(self):
         edge1, edge2, edge3, edge4 = set(), set(), set(), set()
 
@@ -78,21 +68,18 @@ class Board:
 
         return [edge1, edge2, edge3, edge4]
 
+    def get_board_state_as_list(self, player):
+        """Returns the board as a list of 1s and 0s"""
+        state = []
 
-class Diamond(Board):
-    """ Board class with diamond shape """
+        for row in self.cells:
+            for cell in row:
+                state.extend(cell.state)
 
-    def __init__(self, size):
-        super(Diamond, self).__init__(size)
-
-    def create_board(self, size):
-        """ Creates a diamond board of the specified size """
-
-        cells = np.empty((size, size), dtype="object")
-        for row in range(size):
-            for col in range(size):
-                cells[row][col] = Cell((0, 0), (row, col))
-        return cells
+        if player == 1:
+            return [0, 1] + state
+        else:
+            return [1, 0] + state
 
     def get_neighbors(self, r, c):
         """ Finds the neighbors of the cell in (r, c)
