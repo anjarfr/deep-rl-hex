@@ -27,8 +27,6 @@ class MCTS:
         """ Simulations for one move by one player in the game
         Return the child with highest score as action """
 
-        # TODO change to return distribution as well as of action
-
         for i in range(self.simulations):
             self.game.set_player(player)
             self.current_node = self.root
@@ -157,8 +155,8 @@ class MCTS:
     def default_policy(self, state):
         """ Choose a random child state """
         children = self.game.generate_child_states(state)
-        action = self.actor.choose_action(
-            state, self.game.player, self.game.get_legal_actions(state))
+        list_state = state.get_board_state_as_list(self.game.player)
+        action = self.actor.choose_action(list_state, self.game.get_legal_actions(state), state.get_cell_coord())
         for child in children:
             if child[1] == action:
                 return child
