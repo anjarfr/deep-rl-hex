@@ -1,4 +1,4 @@
-from environment.board import Diamond
+from environment.board import Board
 from environment.game import Game
 from copy import deepcopy
 
@@ -12,7 +12,7 @@ class Hex(Game):
         """
         :return: state of the initial game, as stated in configuration file
         """
-        board = Diamond(self.size)
+        board = Board(self.size)
         self.edges = board.get_edge_coords()
         return board
 
@@ -40,6 +40,36 @@ class Hex(Game):
                 if board.cells[r][c].state == (1, 0):
                     return True
         return False
+
+    def perform_action(self, board, action: tuple):
+        """
+        :return: reward for new state
+        """
+        row = action[0]
+        col = action[1]
+
+        if self.player == 1:
+            fill = (0, 1)
+        elif self.player == 2:
+            fill = (1, 0)
+
+        board.set_cell(row, col, fill)
+
+        return board
+
+    def generate_child_states(self, board):
+        """
+        :return: List containing tuples with all child states of given state
+                 and the action taken from state to child state
+                 [(child state, action to child state)]
+        """
+        children = []
+        legal = self.get_legal_actions(board)
+        for action in legal:
+            child_state = deepcopy(board)
+            child_state = self.perform_action(child_state, action)
+            children.append((child_state, action))
+        return children
 
     def depth_first_search(self, board):
         paths = []
@@ -69,32 +99,3 @@ class Hex(Game):
             newset = {(r, c)}
             paths.append(newset)
         return paths
-
-    def perform_action(self, board, action: tuple):
-        """
-        :return: reward for new state
-        """
-        row = action[0]
-        col = action[1]
-
-        if self.player == 1:
-            fill = (0, 1)
-        elif self.player == 2:
-            fill = (1, 0)
-
-        board.set_cell(row, col, fill)
-        return board
-
-    def generate_child_states(self, board):
-        """
-        :return: List containing tuples with all child states of given state
-                 and the action taken from state to child state
-                 [(child state, action to child state)]
-        """
-        children = []
-        legal = self.get_legal_actions(board)
-        for action in legal:
-            child_state = deepcopy(board)
-            child_state = self.perform_action(child_state, action)
-            children.append((child_state, action))
-        return children

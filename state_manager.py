@@ -1,7 +1,4 @@
 from copy import deepcopy
-
-import matplotlib.pyplot as plt
-import numpy as np
 import yaml
 
 from agent.anet import ANET
@@ -30,39 +27,38 @@ class StateManager:
         self.game = Hex(cfg, self.verbose)
         self.initial_state = self.game.generate_initial_state(cfg)
         self.sim_game = Hex(cfg, verbose=False)
-        self.sim_game.generate_initial_state(cfg)
+        self.sim_game_state = self.sim_game.generate_initial_state(cfg)
         self.state = deepcopy(self.initial_state)
 
         self.ANET = ANET(cfg)
-        self.mcts = MCTS(cfg, self.sim_game, self.state,
-                         self.simulations, self.ANET)
-        self.visualizer = Visualizer(
-            self.initial_state, self.game.size, cfg["display"])
+        self.mcts = MCTS(cfg, self.sim_game, self.sim_game_state, self.simulations, self.ANET)
+        self.visualizer = Visualizer(self.initial_state, self.game.size, cfg["display"])
         self.replay_buffer = ReplayBuffer()
-
-        # Initialize ANET with small weights and biases
 
     def play_game(self):
         """ One complete game """
         for i in range(self.episodes):
-            self.game.change_player()
+            self.game.set_initial_player()
 
             while not self.game.game_over(self.state):
-                self.game.change_player()
-
                 """ Do simulations and choose best action """
                 distribution, action = self.mcts.uct_search(self.game.player)
-                print(self.game.player, action)
-                self.replay_buffer.add(self.state, distribution)
+                current_state_with_player = self.state.get_board_state_as_list(self.game.player)
+                self.replay_buffer.add(current_state_with_player, distribution)
+
                 self.state = self.game.perform_action(self.state, action)
+                self.game.change_player()
+
+                if self.verbose:
+                    self.visualizer.fill_nodes(self.state.get_filled_cells())
+
                 self.ANET.decay_epsilon()
 
             """ Train ANET """
             minibatch = self.replay_buffer.create_minibatch()
             train_states = [case[0] for case in minibatch]
             train_targets = [case[1] for case in minibatch]
-            self.ANET.train(train_states, train_targets,
-                            self.game.set_initial_player())
+            self.ANET.train(train_states, train_targets)
 
             """ Save model parameters """
             if i % self.save_interval == 0:
