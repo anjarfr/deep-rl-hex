@@ -76,7 +76,7 @@ class StateManager:
             self.ANET.train(train_states, train_targets)
 
             """ Save model parameters """
-            if i % self.save_interval == 0:
+            if i+1 % self.save_interval == 0:
                 self.ANET.save(i)
 
             """ Reset game """

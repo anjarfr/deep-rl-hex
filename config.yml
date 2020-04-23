@@ -31,5 +31,5 @@ nn:
   dimensions: [25] # Number of nodes in each layer
   activation_hidden: 'linear' # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
   optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
-  save_interval: 50
+  save_interval: 20
   epochs: 2
