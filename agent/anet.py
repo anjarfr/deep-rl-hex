@@ -12,6 +12,8 @@ class ANET:
         self.epsilon_decay = cfg["nn"]["epsilon_decay"]
         self.epochs = cfg["nn"]["epochs"]
         self.model = NeuralNet(cfg, self.board_size)
+        self.loss = []
+        self.accuracy = []
 
     def generate_tensor(self, input_list):
         tensor = torch.FloatTensor(input_list)
@@ -20,9 +22,14 @@ class ANET:
     def train(self, state: list, target: list):
         state = self.generate_tensor(state)
         target = self.generate_tensor(target)
-        predictions = self.model(state)
-        self.model.update(predictions, target)
-        print(self.model)
+        prediction = self.model(state)
+        loss = self.model.update(prediction, target)
+        self.loss.append(loss)
+        self.accuracy.append(self.compute_accuracy(prediction, target))
+
+    def compute_accuracy(self, prediction, target):
+        equal = prediction.argmax(dim=1).eq(target.argmax(dim=1))
+        return equal.sum().numpy()/len(prediction)
 
     def create_legal_indexes(self, moves, legal):
         return [1 if move in legal else 0 for move in moves]
@@ -48,9 +55,6 @@ class ANET:
             normalized = self.re_normalize(prediction, legal_indexes)
             index = normalized.index(max(normalized))
             return all_actions[index]
-
-    def create_legal_indexes(self, moves, legal):
-        return [1 if move in legal else 0 for move in moves]
 
     def decay_epsilon(self):
         self.epsilon = self.epsilon * self.epsilon_decay
@@ -98,16 +102,16 @@ class NeuralNet(nn.Module):
 
         self.optimizer = self.get_optimizer(
             cfg["nn"]["optimizer"], list(self.model.parameters()))
-        # Changed to MSEloss temporarily. Need to fix dims to use crossEntropy
-        self.loss_func = nn.MSELoss()
+
+        self.loss_func = nn.BCELoss()
 
     def update(self, prediction, target):
         """ Update the gradients based on loss """
-        loss = self.loss_func(
-            prediction, target)  # Something wrong with dims here
+        loss = self.loss_func(prediction, target)
         self.optimizer.zero_grad()  # Clears gradients
         loss.backward()
         self.optimizer.step()
+        return loss.item()
 
     def forward(self, x):
         return self.model(x)

@@ -1,5 +1,6 @@
 from copy import deepcopy
 import yaml
+import matplotlib.pyplot as plt
 
 from agent.anet import ANET
 from agent.buffer import ReplayBuffer
@@ -37,6 +38,14 @@ class StateManager:
             self.initial_state, self.game.size, cfg["display"])
         self.replay_buffer = ReplayBuffer()
 
+    def print_loss_and_accuracy(self, loss, accuracy):
+        plt.plot(loss)
+        plt.ylabel('Loss')
+        plt.plot(accuracy)
+        plt.ylabel('Accuracy')
+        plt.xlabel('Iteration')
+        plt.show()
+
     def play_game(self):
         """ One complete game """
         for i in range(self.episodes):
@@ -57,6 +66,8 @@ class StateManager:
 
                 self.ANET.decay_epsilon()
 
+            print(i)
+
             """ Train ANET """
             root_player = self.game.set_initial_player()
             minibatch = self.replay_buffer.create_minibatch()
@@ -72,6 +83,8 @@ class StateManager:
             self.mcts.reset(deepcopy(self.initial_state))
             self.state = deepcopy(self.initial_state)
             self.game.player = self.game.set_initial_player()
+
+        self.print_loss_and_accuracy(self.ANET.loss, self.ANET.accuracy)
 
 
 def main():
