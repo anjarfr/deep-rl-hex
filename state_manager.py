@@ -1,18 +1,15 @@
-import matplotlib.pyplot as plt
-import numpy as np
-import yaml
 from copy import deepcopy
+import yaml
 
+from agent.anet import ANET
+from agent.buffer import ReplayBuffer
+from agent.mcts import MCTS, convert_state
 from environment.hex import Hex
 from environment.visualizer import Visualizer
-from agent.mcts import MCTS
-from agent.buffer import ReplayBuffer
-from agent.anet import ANET
 
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
-PATH = './models/'
 
 class StateManager:
 
@@ -25,32 +22,53 @@ class StateManager:
         self.anet_interval = cfg["agent"]["m"]
         self.TOPP_games = cfg["agent"]["g"]
         self.display_last_game = cfg["display"]["display_last_game"]
+        self.save_interval = cfg["nn"]["save_interval"]
 
         self.game = Hex(cfg, self.verbose)
         self.initial_state = self.game.generate_initial_state(cfg)
         self.sim_game = Hex(cfg, verbose=False)
-        self.sim_game.generate_initial_state(cfg)
+        self.sim_game_state = self.sim_game.generate_initial_state(cfg)
         self.state = deepcopy(self.initial_state)
 
-        self.mcts = MCTS(cfg, self.sim_game, self.state, self.simulations)
-        self.visualizer = Visualizer(self.game.board, self.game.size, cfg["display"])
-        self.buffer = ReplayBuffer()
-
-        # Initialize ANET with small weights and biases
-        self.ANET = ANET()
+        self.ANET = ANET(cfg)
+        self.mcts = MCTS(cfg, self.sim_game, self.sim_game_state,
+                         self.simulations, self.ANET)
+        self.visualizer = Visualizer(
+            self.initial_state, self.game.size, cfg["display"])
+        self.replay_buffer = ReplayBuffer()
 
     def play_game(self):
-
         """ One complete game """
         for i in range(self.episodes):
+            self.game.set_initial_player()
 
-            while not self.game.game_over():
-
+            while not self.game.game_over(self.state):
                 """ Do simulations and choose best action """
-                action = self.mcts.uct_search(self.game.player)
-                self.state = self.game.perform_action(self.state, action)
+                distribution, action = self.mcts.uct_search(self.game.player)
+                current_state_with_player = self.state.get_board_state_as_list(
+                    self.game.player)
+                self.replay_buffer.add(current_state_with_player, distribution)
 
-            # Reset game
+                self.state = self.game.perform_action(self.state, action)
+                self.game.change_player()
+
+                if self.verbose:
+                    self.visualizer.fill_nodes(self.state.get_filled_cells())
+
+                self.ANET.decay_epsilon()
+
+            """ Train ANET """
+            root_player = self.game.set_initial_player()
+            minibatch = self.replay_buffer.create_minibatch()
+            train_states = [case[0] for case in minibatch]
+            train_targets = [case[1] for case in minibatch]
+            self.ANET.train(train_states, train_targets)
+
+            """ Save model parameters """
+            if i % self.save_interval == 0:
+                self.ANET.save(i)
+
+            """ Reset game """
             self.mcts.reset(deepcopy(self.initial_state))
             self.state = deepcopy(self.initial_state)
             self.game.player = self.game.set_initial_player()

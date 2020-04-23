@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-import yaml
 import random
 
 
@@ -9,40 +8,60 @@ class ANET:
 
     def __init__(self, cfg):
         self.board_size = cfg["game"]["board_size"]
+        self.epsilon = cfg["nn"]["epsilon"]
+        self.epsilon_decay = cfg["nn"]["epsilon_decay"]
+        self.epochs = cfg["nn"]["epochs"]
         self.model = NeuralNet(cfg, self.board_size)
 
-    def predict(self, state):
-        return self.model(state)
+    def generate_tensor(self, input_list):
+        tensor = torch.FloatTensor(input_list)
+        return tensor
 
-    def train(self, state, target):
-        prediction = self.model(state)
-        self.model.update(prediction, target)
+    def train(self, state: list, target: list):
+        state = self.generate_tensor(state)
+        target = self.generate_tensor(target)
+        predictions = self.model(state)
+        self.model.update(predictions, target)
+        print(self.model)
 
-    def re_normalize(self, prediction, legal):
+    def create_legal_indexes(self, moves, legal):
+        return [1 if move in legal else 0 for move in moves]
+
+    def re_normalize(self, prediction, legal_indexes):
         """ Sets all illegal moves to 0 and renormalizes the 
         distribution """
-        remove_illegal = [a*b for a, b in zip(prediction, legal)]
+        remove_illegal = [a * b for a,
+                          b in zip(prediction.tolist(), legal_indexes)]
         total = sum(remove_illegal)
-        normalized = [float(i)/total for i in remove_illegal]
+        normalized = [float(i) / total for i in remove_illegal]
         return normalized
 
-    def choose_action(self, prediction, legal, epsilon):
-        """ Returns index of chosen action
-        """
-        # TODO Must be called from somewhere, maybe in MCTS after prediction has been made in ANET, or in ANET
-        if random.uniform(0, 1) < epsilon:
-            return legal[random.randrange(len(legal))]
+    def choose_action(self, state, legal_actions, all_actions):
+        """ Returns index of chosen action """
+
+        prediction = self.model(self.generate_tensor(state))
+        if random.uniform(0, 1) < self.epsilon:
+            return random.choice(legal_actions)
         else:
-            normalized_predictions = self.re_normalize(prediction, legal)
-            return normalized_predictions.index(max(normalized_predictions))
+            legal_indexes = self.create_legal_indexes(
+                all_actions, legal_actions)
+            normalized = self.re_normalize(prediction, legal_indexes)
+            index = normalized.index(max(normalized))
+            return all_actions[index]
+
+    def create_legal_indexes(self, moves, legal):
+        return [1 if move in legal else 0 for move in moves]
+
+    def decay_epsilon(self):
+        self.epsilon = self.epsilon * self.epsilon_decay
 
     def save(self, i):
         torch.save(
-            self.model.state_dict(), 'models/ANET_{}_size_{}.pth'.format(i, self.board_size))
+            self.model.state_dict(), 'models/ANET_{}_size_{}'.format(i, self.board_size))
 
     def load(self, i):
         self.model.load_state_dict(torch.load(
-            'models/ANET_{}_size_{}.pth'.format(i, self.board_size)))
+            'models/ANET_{}_size_{}'.format(i, self.board_size)))
         self.model.eval()
 
 
@@ -56,8 +75,8 @@ class NeuralNet(nn.Module):
         self.learning_rate = cfg["nn"]["learning_rate"]
         self.activation = self.get_activation(cfg["nn"]["activation_hidden"])
 
-        input_size = 2*k**2 + 2
-        output_size = k**2
+        input_size = 2 * k ** 2 + 2
+        output_size = k ** 2
 
         layers = []
 
@@ -66,27 +85,32 @@ class NeuralNet(nn.Module):
             layers.append(self.activation) if self.activation else None
             for i in range(len(self.dimensions) - 1):
                 layers.append(
-                    nn.Linear(self.dimensions[i], self.dimensions[i+1]))
+                    nn.Linear(self.dimensions[i], self.dimensions[i + 1]))
                 layers.append(self.activation) if self.activation else None
             layers.append(nn.Linear(self.dimensions[-1], output_size))
-            layers.append(nn.Softmax(dim=1))
+            layers.append(nn.Softmax(dim=-1))
         else:
             layers.append(nn.Linear(input_size, output_size))
-            layers.append(nn.Softmax(dim=1))
+            layers.append(nn.Softmax(dim=-1))
 
         self.model = nn.Sequential(*layers)
         self.model.apply(self.init_weights)
 
         self.optimizer = self.get_optimizer(
             cfg["nn"]["optimizer"], list(self.model.parameters()))
-        self.loss_func = nn.CrossEntropyLoss()
+        # Changed to MSEloss temporarily. Need to fix dims to use crossEntropy
+        self.loss_func = nn.MSELoss()
 
     def update(self, prediction, target):
         """ Update the gradients based on loss """
-        loss = self.loss_func(prediction, target)
+        loss = self.loss_func(
+            prediction, target)  # Something wrong with dims here
         self.optimizer.zero_grad()  # Clears gradients
         loss.backward()
         self.optimizer.step()
+
+    def forward(self, x):
+        return self.model(x)
 
     def init_weights(self, m):
         if type(m) == nn.Linear:

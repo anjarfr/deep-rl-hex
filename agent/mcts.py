@@ -4,18 +4,28 @@ import random
 random.seed(2020)
 
 
+def convert_state(state, player):
+    listed_state = []
+    listed_state.extend([0, 1] if player == 1 else [1, 0])
+    for row in state.cells:
+        for cell in row:
+            listed_state.extend(list(cell.state))
+    return listed_state
+
+
 class MCTS:
     """
     Monte Carlo Tree Search
     """
 
-    def __init__(self, cfg, game, init_state, simulations):
+    def __init__(self, cfg, game, init_state, simulations, actor):
         self.cfg = cfg
         self.game = game
         self.root = self.create_root_node(init_state)
         self.current_node = self.root
         self.simulations = simulations
         self.c = cfg["agent"]["c"]
+        self.actor = actor
 
     def create_root_node(self, init_state):
         """ Initialize the root node."""
@@ -34,10 +44,12 @@ class MCTS:
         self.game.set_player(player)
         the_chosen_one = self.select_move(self.root, c=0)
 
-        #self.root.print_tree()
+        # self.root.print_tree()
 
+        distribution = self.get_probability_distribution()
         self.root = the_chosen_one
-        return the_chosen_one.action
+
+        return distribution, the_chosen_one.action
 
     def simulate(self):
         """ Use tree search to find current simulation root
@@ -75,7 +87,8 @@ class MCTS:
 
         # Choose randomly between unvisited children
         chosen = random.choice(missing_child_actions)
-        node.expand(chosen[0], chosen[1])  # Here we expand with only this chosen child
+        # Here we expand with only this chosen child
+        node.expand(chosen[0], chosen[1])
 
         return node.children[chosen[1]]
 
@@ -85,19 +98,16 @@ class MCTS:
 
         state = self.current_node.state
         path = [self.current_node]
+        self.game.change_player()
 
         while not self.game.game_over(state):
-
+            self.game.change_player()
             # If the children of the current node have not been added to the tree
             if not self.fully_expanded(self.current_node):
 
                 self.current_node = self.node_expansion(self.current_node)
                 state = self.current_node.state
                 path.append(self.current_node)
-
-                if not self.game.game_over(state):
-                    self.game.change_player()
-
                 return path
 
             # If all children have been visited already, go deeper into the tree
@@ -105,9 +115,6 @@ class MCTS:
                 self.current_node = self.select_move(self.current_node, self.c)
                 path.append(self.current_node)
                 state = self.current_node.state
-
-            if not self.game.game_over(state):
-                self.game.change_player()
 
         return path
 
@@ -157,17 +164,50 @@ class MCTS:
     def default_policy(self, state):
         """ Choose a random child state """
         children = self.game.generate_child_states(state)
-        chosen_child = random.choice(children)
-        return chosen_child
+        action = self.actor.choose_action(
+            state.get_board_state_as_list(self.game.player),
+            self.game.get_legal_actions(state),
+            state.get_cell_coord()
+        )
+        for child in children:
+            if child[1] == action:
+                return child
+        return None
 
     def backpropagate(self, path: list, z: int):
         """
         Update visits and average wins
         """
-
         for node in path:
             node.visits += 1
             node.avg_wins += z
+
+    def get_probability_distribution(self):
+        """ Return distribution child node visit counts from current root"""
+
+        dist_length = self.game.size ** 2
+        distribution = [0] * dist_length
+
+        # Must somehow know which index corresponds to each action
+        children = self.root.children
+        valid_actions = self.root.children.keys()
+        all_actions = self.root.state.get_cell_coord()
+
+        for action in valid_actions:
+            child = children.get(action)
+            visit_count = child.visits
+            action_index = all_actions.index(action)
+            distribution[action_index] = visit_count
+
+        normalized_distribution = self.normalize_distribution(distribution)
+        return normalized_distribution
+
+    def normalize_distribution(self, distribution):
+        total = sum(distribution)
+        normalized_distribution = [
+            float(pred) / total for pred in distribution]
+
+        return normalized_distribution
 
     def reset(self, init_state):
         self.root = self.create_root_node(init_state)

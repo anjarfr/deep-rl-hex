@@ -7,7 +7,7 @@ with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
 hex = Hex(cfg, True)
-state = Diamond(hex.size)
+state = hex.generate_initial_state(cfg)
 
 state = hex.perform_action(state, (1, 1))
 hex.change_player()
@@ -26,6 +26,27 @@ hex.change_player()
 state = hex.perform_action(state, (1, 3))
 hex.change_player()
 state = hex.perform_action(state, (1, 0))
+hex.change_player()
+state = hex.perform_action(state, (3, 0))
+
+print(hex.game_over(state))
+
+hex.change_player()
+state = hex.perform_action(state, (0, 3))
+hex.change_player()
+state = hex.perform_action(state, (0, 1))
+hex.change_player()
+state = hex.perform_action(state, (3, 3))
+hex.change_player()
+
+print(hex.game_over(state))
+
+state = hex.perform_action(state, (3, 1))
+hex.change_player()
+state = hex.perform_action(state, (3, 2))
+hex.change_player()
+state = hex.perform_action(state, (0, 0))
+
 
 print(hex.game_over(state))
 

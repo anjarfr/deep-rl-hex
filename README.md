@@ -1,15 +1,24 @@
 # On-Policy Monte Carlo Tree Search for Game Playing
 
 ## TODO
-- [ ] Hex logikk
+- [x] Hex logikk
 - [x] Visualisere boardet
-- [ ] ANET - fjerne eligibilities
-- [ ] RBUF
-- [ ] Finne ut hvordan illegal moves settes til 0 
-- [ ] Implementere e-greedy 
+- [x] ANET - fjerne eligibilities
+- [x] RBUF
+- [x] Finne ut hvordan illegal moves settes til 0 
+- [x] Implementere e-greedy for rollout og choose action
 - [ ] Litt randomness på target policy også (sigma)  
 - [x] Finne ut hvilke variabler vi trenger i config 
-- [ ] Implementere at vi både får evaluation og prob dist som output fra ANET som vi kan bruke som critic 
+- [ ] Implementere at vi både får evaluation og prob dist som output fra ANET som vi kan bruke som critic
+- [ ] Implementere accuracy
+- [ ] Add rollout nodes to backprop path
+- [ ] Select actual move in MCTS use visit count
+- [x] Include current player in state from MCTS
+- [ ] Change loss back to CrossEntropy and fix tensor formats
+- [ ] Make sure its not allowed to "perform action" on an already filled cell
+
+### TODO TOPP
+- [ ] Make sure actual games can be visualized
 
 Spørre om: 
 - [ ] Kan vi ha et critic og et actor nett? Hvis vi skal ha ett, hvordan trener vi det opp for å gjøre begge deler? 
@@ -34,7 +43,7 @@ Use this to select mini-batches for the NN to train on after each completed epis
 - After an actual move is made, we keep the subtree below the chosen node, and throw away the rest of the tree. 
 
 #### Policies
-- Three policy: Like last time (Q + U)
+- Tree policy: Like last time (Q + U)
 - Default policy in tree: Use actor epsilon greedy of random move, else best move.  
 - Training/default policy: Use actor with randomness/epsilon (more in the beginning)
 - Target policy: Use actor but with a smaller chance of randomness. 
