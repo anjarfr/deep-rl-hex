@@ -3,7 +3,7 @@ import yaml
 
 from agent.anet import ANET
 from agent.buffer import ReplayBuffer
-from agent.mcts import MCTS
+from agent.mcts import MCTS, convert_state
 from environment.hex import Hex
 from environment.visualizer import Visualizer
 
@@ -55,6 +55,7 @@ class StateManager:
                 self.ANET.decay_epsilon()
 
             """ Train ANET """
+            root_player = self.game.set_initial_player()
             minibatch = self.replay_buffer.create_minibatch()
             train_states = [case[0] for case in minibatch]
             train_targets = [case[1] for case in minibatch]

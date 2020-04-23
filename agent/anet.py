@@ -10,20 +10,21 @@ class ANET:
         self.board_size = cfg["game"]["board_size"]
         self.epsilon = cfg["nn"]["epsilon"]
         self.epsilon_decay = cfg["nn"]["epsilon_decay"]
+        self.epochs = cfg["nn"]["epochs"]
         self.model = NeuralNet(cfg, self.board_size)
 
     def generate_tensor(self, input_list):
         tensor = torch.FloatTensor(input_list)
         return tensor
 
-    def predict(self, state):
-        return self.model(state)
-
     def train(self, state: list, target: list):
         state = self.generate_tensor(state)
         target = self.generate_tensor(target)
         predictions = self.model(state)
         self.model.update(predictions, target)
+
+    def create_legal_indexes(self, moves, legal):
+        return [1 if move in legal else 0 for move in moves]
 
     def re_normalize(self, prediction, legal_indexes):
         """ Sets all illegal moves to 0 and renormalizes the 

@@ -4,6 +4,15 @@ import random
 random.seed(2020)
 
 
+def convert_state(state, player):
+    listed_state = []
+    listed_state.extend([0, 1] if player == 1 else [1, 0])
+    for row in state.cells:
+        for cell in row:
+            listed_state.extend(list(cell.state))
+    return listed_state
+
+
 class MCTS:
     """
     Monte Carlo Tree Search
@@ -155,8 +164,11 @@ class MCTS:
     def default_policy(self, state):
         """ Choose a random child state """
         children = self.game.generate_child_states(state)
-        list_state = state.get_board_state_as_list(self.game.player)
-        action = self.actor.choose_action(list_state, self.game.get_legal_actions(state), state.get_cell_coord())
+        action = self.actor.choose_action(
+            state.get_board_state_as_list(self.game.player),
+            self.game.get_legal_actions(state),
+            state.get_cell_coord()
+        )
         for child in children:
             if child[1] == action:
                 return child
@@ -166,7 +178,6 @@ class MCTS:
         """
         Update visits and average wins
         """
-
         for node in path:
             node.visits += 1
             node.avg_wins += z
