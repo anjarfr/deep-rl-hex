@@ -31,8 +31,10 @@ class StateManager:
         self.state = deepcopy(self.initial_state)
 
         self.ANET = ANET(cfg)
-        self.mcts = MCTS(cfg, self.sim_game, self.sim_game_state, self.simulations, self.ANET)
-        self.visualizer = Visualizer(self.initial_state, self.game.size, cfg["display"])
+        self.mcts = MCTS(cfg, self.sim_game, self.sim_game_state,
+                         self.simulations, self.ANET)
+        self.visualizer = Visualizer(
+            self.initial_state, self.game.size, cfg["display"])
         self.replay_buffer = ReplayBuffer()
 
     def play_game(self):
@@ -43,7 +45,8 @@ class StateManager:
             while not self.game.game_over(self.state):
                 """ Do simulations and choose best action """
                 distribution, action = self.mcts.uct_search(self.game.player)
-                current_state_with_player = self.state.get_board_state_as_list(self.game.player)
+                current_state_with_player = self.state.get_board_state_as_list(
+                    self.game.player)
                 self.replay_buffer.add(current_state_with_player, distribution)
 
                 self.state = self.game.perform_action(self.state, action)

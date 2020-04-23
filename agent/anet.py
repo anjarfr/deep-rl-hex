@@ -22,6 +22,7 @@ class ANET:
         target = self.generate_tensor(target)
         predictions = self.model(state)
         self.model.update(predictions, target)
+        print(self.model)
 
     def create_legal_indexes(self, moves, legal):
         return [1 if move in legal else 0 for move in moves]
@@ -30,7 +31,7 @@ class ANET:
         """ Sets all illegal moves to 0 and renormalizes the 
         distribution """
         remove_illegal = [a * b for a,
-                                    b in zip(prediction.tolist(), legal_indexes)]
+                          b in zip(prediction.tolist(), legal_indexes)]
         total = sum(remove_illegal)
         normalized = [float(i) / total for i in remove_illegal]
         return normalized
@@ -42,7 +43,8 @@ class ANET:
         if random.uniform(0, 1) < self.epsilon:
             return random.choice(legal_actions)
         else:
-            legal_indexes = self.create_legal_indexes(all_actions, legal_actions)
+            legal_indexes = self.create_legal_indexes(
+                all_actions, legal_actions)
             normalized = self.re_normalize(prediction, legal_indexes)
             index = normalized.index(max(normalized))
             return all_actions[index]
@@ -96,11 +98,13 @@ class NeuralNet(nn.Module):
 
         self.optimizer = self.get_optimizer(
             cfg["nn"]["optimizer"], list(self.model.parameters()))
-        self.loss_func = nn.MSELoss()  # Changed to MSEloss temporarily. Need to fix dims to use crossEntropy
+        # Changed to MSEloss temporarily. Need to fix dims to use crossEntropy
+        self.loss_func = nn.MSELoss()
 
     def update(self, prediction, target):
         """ Update the gradients based on loss """
-        loss = self.loss_func(prediction, target)  # Something wrong with dims here
+        loss = self.loss_func(
+            prediction, target)  # Something wrong with dims here
         self.optimizer.zero_grad()  # Clears gradients
         loss.backward()
         self.optimizer.step()
