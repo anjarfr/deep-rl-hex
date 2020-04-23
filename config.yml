@@ -27,7 +27,7 @@ agent:
 nn:
   learning_rate: 0.01
   epsilon: 1
-  epsilon_decay: 0.99
+  epsilon_decay: 0.95
   dimensions: [25] # Number of nodes in each layer
   activation_hidden: 'linear' # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
   optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
