@@ -32,3 +32,4 @@ nn:
   activation_hidden: 'linear' # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
   optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
   save_interval: 50
+  epochs: 2

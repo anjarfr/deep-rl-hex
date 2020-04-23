@@ -11,27 +11,19 @@ class ANET:
         self.board_size = cfg["game"]["board_size"]
         self.epsilon = cfg["nn"]["epsilon"]
         self.epsilon_decay = cfg["nn"]["epsilon_decay"]
+        self.epochs = cfg["nn"]["epochs"]
         self.model = NeuralNet(cfg, self.board_size)
 
-    def generate_tensor(self, state, player):
-        """ Creates a tensor of state where state is of class Board """
-        if player == 1:
-            listed_state = [0, 1]
-        else:
-            listed_state = [1, 0]
-        for row in state.cells:
-            for cell in row:
-                listed_state.extend(list(cell.coordinates))
-        tensor = torch.tensor(listed_state, dtype=torch.float32)
-        return tensor
+    def generate_tensor(self, state):
+        """ Creates a tensor of a list"""
+        return torch.tensor(state, dtype=torch.float32)
 
-    def predict(self, state, player):
-        return self.model(state)
-
-    def train(self, state: list, target: list, player: int):
-        state = self.generate_tensor(state, player)
-        predictions = self.model(state)
-        self.model.update(predictions, targets)
+    def train(self, states: list, targets: list):
+        for i, s in enumerate(states):
+            state = torch.tensor(s, dtype=torch.float32)
+            target = torch.tensor(targets[i], dtype=torch.float32)
+        prediction = self.model(state)
+        self.model.update(prediction, target)
 
     def create_legal_indexes(self, moves, legal):
         return [1 if move in legal else 0 for move in moves]
@@ -45,15 +37,14 @@ class ANET:
         normalized = [float(i)/total for i in remove_illegal]
         return normalized
 
-    def choose_action(self, state, player, legal):
+    def choose_action(self, state, moves, legal):
         """ Returns index of chosen action
         """
         # TODO Must be called from somewhere, maybe in MCTS after prediction has been made in ANET, or in ANET
-        prediction = self.model(self.generate_tensor(state, player))
+        prediction = self.model(self.generate_tensor(state))
         if random.uniform(0, 1) < self.epsilon:
             return random.choice(legal)
         else:
-            moves = state.get_cell_coord()
             legal_indexes = self.create_legal_indexes(moves, legal)
             normalized = self.re_normalize(prediction, legal_indexes)
             index = normalized.index(max(normalized))

@@ -6,7 +6,7 @@ import yaml
 
 from agent.anet import ANET
 from agent.buffer import ReplayBuffer
-from agent.mcts import MCTS
+from agent.mcts import MCTS, convert_state
 from environment.hex import Hex
 from environment.visualizer import Visualizer
 
@@ -40,8 +40,6 @@ class StateManager:
             self.initial_state, self.game.size, cfg["display"])
         self.replay_buffer = ReplayBuffer()
 
-        # Initialize ANET with small weights and biases
-
     def play_game(self):
         """ One complete game """
         for i in range(self.episodes):
@@ -53,16 +51,21 @@ class StateManager:
                 """ Do simulations and choose best action """
                 distribution, action = self.mcts.uct_search(self.game.player)
                 print(self.game.player, action)
-                self.replay_buffer.add(self.state, distribution)
+
+                # TODO: litt usikker på om det er rett å legge til self.game.player eller initial_player
+                # i convert_state funk
+                self.replay_buffer.add(convert_state(
+                    self.state, self.game.player), distribution)
+
                 self.state = self.game.perform_action(self.state, action)
                 self.ANET.decay_epsilon()
 
             """ Train ANET """
+            root_player = self.game.set_initial_player()
             minibatch = self.replay_buffer.create_minibatch()
             train_states = [case[0] for case in minibatch]
             train_targets = [case[1] for case in minibatch]
-            self.ANET.train(train_states, train_targets,
-                            self.game.set_initial_player())
+            self.ANET.train(train_states, train_targets)
 
             """ Save model parameters """
             if i % self.save_interval == 0:
