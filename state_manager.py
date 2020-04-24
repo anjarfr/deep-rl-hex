@@ -1,6 +1,7 @@
 from copy import deepcopy
 import yaml
 import matplotlib.pyplot as plt
+import random
 
 from agent.anet import ANET
 from agent.buffer import ReplayBuffer
@@ -54,11 +55,15 @@ class StateManager:
         self.replay_buffer = ReplayBuffer()
 
     def print_loss_and_accuracy(self, loss, accuracy):
+        title = random.uniform(0, 1)
+        print(title)
+
         plt.plot(loss)
         plt.ylabel('Loss')
         plt.plot(accuracy)
         plt.ylabel('Accuracy')
         plt.xlabel('Iteration')
+        plt.title(str(title))
         plt.show()
 
     def play_game(self):
@@ -88,10 +93,9 @@ class StateManager:
             self.ANET.train(self.replay_buffer)
 
             """ Save model parameters """
-            if (i+1) % self.save_interval == 0:
+            if i == 0 or (i+1) % self.save_interval == 0:
                 self.ANET.save(i+1)
-                # self.print_loss_and_accuracy(
-                #    self.ANET.loss, self.ANET.accuracy)
+                self.print_loss_and_accuracy(self.ANET.loss, self.ANET.accuracy)
 
             """ Reset game """
             self.mcts.reset(deepcopy(self.initial_state))

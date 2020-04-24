@@ -35,16 +35,31 @@ class ANET:
             train_targets = [case[1] for case in minibatch]
             state = self.generate_tensor(train_states)
             target = self.generate_tensor(train_targets)
+
             prediction = self.model(state)
+
+            #print(prediction)
+            #print(target)
+
+            #target = target.argmax(1).to(dtype=torch.int64)
+            #print(target)
+
             loss = self.model.update(prediction, target)
 
-        print(loss)
+
         self.loss.append(loss)
+
+        print("Loss", loss)
         self.accuracy.append(self.compute_accuracy(prediction, target))
 
     def compute_accuracy(self, prediction, target):
         equal = prediction.argmax(dim=1).eq(target.argmax(dim=1))
-        return equal.sum().numpy()/len(prediction)
+
+        print(equal)
+        accuracy = equal.sum().numpy()/len(prediction)
+
+        print("Accuracy", accuracy)
+        return accuracy
 
     def create_legal_indexes(self, moves, legal):
         return [1 if move in legal else 0 for move in moves]
@@ -59,11 +74,12 @@ class ANET:
             return [float(i) / total for i in remove_illegal]
         return remove_illegal
 
-    def choose_action(self, state, legal_actions, all_actions, epsilon):
+    def choose_action(self, state, legal_actions, all_actions):
         """ Returns index of chosen action """
 
         prediction = self.model(self.generate_tensor(state))
-        if random.uniform(0, 1) >= epsilon:
+
+        if random.uniform(0, 1) >= self.epsilon:
             legal_indexes = self.create_legal_indexes(
                 all_actions, legal_actions)
             normalized = self.re_normalize(prediction, legal_indexes)
@@ -77,11 +93,11 @@ class ANET:
 
     def save(self, i):
         torch.save(
-            self.model.state_dict(), 'models/ANET_{}_size_{}'.format(i, self.board_size))
+            self.model.state_dict(), 'new-models/ANET_{}_size_{}'.format(i, self.board_size))
 
     def load(self, i, size):
         self.model.load_state_dict(torch.load(
-            'models/ANET_{}_size_{}'.format(i, size)))
+            'new-models/ANET_{}_size_{}'.format(i, size)))
         self.model.eval()
 
 
@@ -121,12 +137,15 @@ class NeuralNet(nn.Module):
 
         self.loss_func = nn.BCELoss()
 
+    def CXE(self, prediction, target):
+        return -(target * torch.log(prediction)).sum(dim=1).mean()
+
     def update(self, prediction, target):
         """ Update the gradients based on loss """
         loss = self.loss_func(prediction, target)
-        self.optimizer.zero_grad()  # Clears gradients
         loss.backward()
         self.optimizer.step()
+        self.optimizer.zero_grad()  # Clears gradients
         return loss.item()
 
     def forward(self, x):
