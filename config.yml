@@ -33,4 +33,4 @@ nn:
   optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
   save_interval: 50
   epochs: 20
-  batch_size: 1000
+  batch_size: 2000

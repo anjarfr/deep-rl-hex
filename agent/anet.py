@@ -55,21 +55,22 @@ class ANET:
         remove_illegal = [a * b for a,
                           b in zip(prediction.tolist(), legal_indexes)]
         total = sum(remove_illegal)
-        normalized = [float(i) / total for i in remove_illegal]
-        return normalized
+        if total:
+            return [float(i) / total for i in remove_illegal]
+        return remove_illegal
 
     def choose_action(self, state, legal_actions, all_actions, epsilon):
         """ Returns index of chosen action """
 
         prediction = self.model(self.generate_tensor(state))
-        if random.uniform(0, 1) < epsilon:
-            return random.choice(legal_actions)
-        else:
+        if random.uniform(0, 1) >= epsilon:
             legal_indexes = self.create_legal_indexes(
                 all_actions, legal_actions)
             normalized = self.re_normalize(prediction, legal_indexes)
             index = normalized.index(max(normalized))
-            return all_actions[index]
+            if all_actions[index] in legal_actions:
+                return all_actions[index]
+        return random.choice(legal_actions)
 
     def decay_epsilon(self):
         self.epsilon = self.epsilon * self.epsilon_decay
