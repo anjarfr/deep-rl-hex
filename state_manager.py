@@ -76,7 +76,7 @@ class StateManager:
                 self.state = self.game.perform_action(self.state, action)
                 self.game.change_player()
 
-                if self.verbose:
+                if self.verbose and i == 100:
                     self.visualizer.fill_nodes(self.state.get_filled_cells())
 
             self.ANET.decay_epsilon()
