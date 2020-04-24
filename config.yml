@@ -20,7 +20,7 @@ display:
 agent:
   c: 1 # exploration constant
   episodes: 200 # number of episodes
-  simulations: 1000 # number of simulations (and hence rollouts) per actual game move
+  simulations: 500 # number of simulations (and hence rollouts) per actual game move
   m: 5 # interval of ANETs to be cached for playing TOPP
   g: 10 # number of games played in TOPP
 
@@ -32,4 +32,5 @@ nn:
   activation_hidden: 'relu' # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
   optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
   save_interval: 50
-  epochs: 2
+  epochs: 10
+  batch_size: 1000

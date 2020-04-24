@@ -29,8 +29,9 @@ class ANET:
     def train(self, state: list, target: list):
         state = self.generate_tensor(state)
         target = self.generate_tensor(target)
-        prediction = self.model(state)
-        loss = self.model.update(prediction, target)
+        for i in range(self.epochs):
+            prediction = self.model(state)
+            loss = self.model.update(prediction, target)
         self.loss.append(loss)
         self.accuracy.append(self.compute_accuracy(prediction, target))
 

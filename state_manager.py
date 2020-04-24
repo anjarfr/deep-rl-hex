@@ -43,6 +43,7 @@ class StateManager:
         epsilon = cfg["nn"]["epsilon"]
         epochs = cfg["nn"]["epochs"]
         lr = cfg["nn"]["learning_rate"]
+        self.batch_size = cfg["nn"]["batch_size"]
 
         self.ANET = ANET(board_size, dimensions, lr, activation,
                          optimizer, epsilon, epsilon_decay, epochs)
@@ -83,7 +84,7 @@ class StateManager:
             print(i, self.ANET.epsilon)
 
             """ Train ANET """
-            minibatch = self.replay_buffer.create_minibatch()
+            minibatch = self.replay_buffer.create_minibatch(self.batch_size)
             train_states = [case[0] for case in minibatch]
             train_targets = [case[1] for case in minibatch]
             self.ANET.train(train_states, train_targets)
