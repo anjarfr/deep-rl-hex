@@ -43,10 +43,10 @@ class StateManager:
         epsilon = cfg["nn"]["epsilon"]
         epochs = cfg["nn"]["epochs"]
         lr = cfg["nn"]["learning_rate"]
-        self.batch_size = cfg["nn"]["batch_size"]
+        batch_size = cfg["nn"]["batch_size"]
 
         self.ANET = ANET(board_size, dimensions, lr, activation,
-                         optimizer, epsilon, epsilon_decay, epochs)
+                         optimizer, epsilon, epsilon_decay, epochs, batch_size)
         self.mcts = MCTS(cfg, self.sim_game, self.sim_game_state,
                          self.simulations, self.ANET)
         self.visualizer = Visualizer(
@@ -84,10 +84,8 @@ class StateManager:
             print(i, self.ANET.epsilon)
 
             """ Train ANET """
-            minibatch = self.replay_buffer.create_minibatch(self.batch_size)
-            train_states = [case[0] for case in minibatch]
-            train_targets = [case[1] for case in minibatch]
-            self.ANET.train(train_states, train_targets)
+
+            self.ANET.train(self.replay_buffer)
 
             """ Save model parameters """
             if (i+1) % self.save_interval == 0:
