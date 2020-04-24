@@ -67,13 +67,13 @@ class ANET:
     def decay_epsilon(self):
         self.epsilon = self.epsilon * self.epsilon_decay
 
-    def save(self, i, size):
+    def save(self, i):
         torch.save(
-            self.model.state_dict(), 'models/ANET_{}_size_{}'.format(i, size))
+            self.model.state_dict(), 'models/ANET_{}_size_{}'.format(i, self.board_size))
 
-    def load(self, i):
+    def load(self, i, size):
         self.model.load_state_dict(torch.load(
-            'models/ANET_{}_size_{}'.format(i, self.board_size)))
+            'models/ANET_{}_size_{}'.format(i, size)))
         self.model.eval()
 
 
