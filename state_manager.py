@@ -28,9 +28,9 @@ class StateManager:
         # -- Hex game and sim game initialization --
         board_size = cfg["game"]["board_size"]
         initial_player = cfg["game"]["player"]
-        self.game = Hex(board_size, initial_player, self.verbose)
+        self.game = Hex(board_size, initial_player)
         self.initial_state = self.game.generate_initial_state(cfg)
-        self.sim_game = Hex(cfg, verbose=False)
+        self.sim_game = Hex(board_size, initial_player)
         self.sim_game_state = self.sim_game.generate_initial_state(cfg)
         self.state = deepcopy(self.initial_state)
 
