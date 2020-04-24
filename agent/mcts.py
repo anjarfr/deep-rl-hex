@@ -165,10 +165,10 @@ class MCTS:
         """ Choose a random child state """
         children = self.game.generate_child_states(state)
         action = self.actor.choose_action(
-            state.get_board_state_as_list(self.game.player),
-            self.game.get_legal_actions(state),
-            state.get_cell_coord(),
-            self.actor.epsilon
+            state=state.get_board_state_as_list(self.game.player),
+            legal_actions=self.game.get_legal_actions(state),
+            all_actions=state.get_cell_coord(),
+            epsilon=self.actor.epsilon
         )
         for child in children:
             if child[1] == action:
