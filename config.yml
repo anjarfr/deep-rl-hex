@@ -25,11 +25,11 @@ agent:
   g: 10 # number of games played in TOPP
 
 nn:
-  learning_rate: 0.01
+  learning_rate: 0.005
   epsilon: 1
   epsilon_decay: 0.97
   dimensions: [128, 128, 64, 64] # Number of nodes in each layer
-  activation_hidden: 'sigmoid' # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
+  activation_hidden: 'relu' # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
   optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
   save_interval: 50
   epochs: 2
