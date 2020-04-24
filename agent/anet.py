@@ -6,7 +6,7 @@ import random
 
 class ANET:
 
-    def __init__(self, board_size, dims, lr, activation, optimizer, epsilon, epsilon_decay, epochs):
+    def __init__(self, board_size, dims, lr, activation, optimizer, epsilon, epsilon_decay, epochs, batch_size):
         self.board_size = board_size
         self.model = NeuralNet(
             k=self.board_size,
@@ -19,6 +19,7 @@ class ANET:
         self.epsilon = epsilon
         self.epsilon_decay = epsilon_decay
         self.epochs = epochs
+        self.batch_size = batch_size
         self.loss = []
         self.accuracy = []
 
@@ -26,12 +27,18 @@ class ANET:
         tensor = torch.FloatTensor(input_list)
         return tensor
 
-    def train(self, state: list, target: list):
-        state = self.generate_tensor(state)
-        target = self.generate_tensor(target)
+    def train(self, replay_buffer):
+
         for i in range(self.epochs):
+            minibatch = replay_buffer.create_minibatch(self.batch_size)
+            train_states = [case[0] for case in minibatch]
+            train_targets = [case[1] for case in minibatch]
+            state = self.generate_tensor(train_states)
+            target = self.generate_tensor(train_targets)
             prediction = self.model(state)
             loss = self.model.update(prediction, target)
+
+        print(loss)
         self.loss.append(loss)
         self.accuracy.append(self.compute_accuracy(prediction, target))
 
