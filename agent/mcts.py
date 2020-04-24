@@ -167,7 +167,8 @@ class MCTS:
         action = self.actor.choose_action(
             state.get_board_state_as_list(self.game.player),
             self.game.get_legal_actions(state),
-            state.get_cell_coord()
+            state.get_cell_coord(),
+            self.actor.epsilon
         )
         for child in children:
             if child[1] == action:

@@ -10,10 +10,9 @@ class Game:
     Interface for games
     """
 
-    def __init__(self, cfg, verbose):
-        self.verbose = verbose
-        self.size = cfg["game"]["board_size"]
-        self.initial_player = cfg["game"]["player"]
+    def __init__(self, size, player):
+        self.size = size
+        self.initial_player = player
         self.player = self.set_initial_player()
 
     def game_result(self):
