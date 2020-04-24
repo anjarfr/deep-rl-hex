@@ -54,7 +54,12 @@ class Hex(Game):
         elif self.player == 2:
             fill = (1, 0)
 
-        board.set_cell(row, col, fill)
+        if not board.cells[row][col].is_filled():
+            board.set_cell(row, col, fill)
+        else:
+            raise Exception(
+                "Not a valid move, that cell is already occupied"
+            )
 
         return board
 
