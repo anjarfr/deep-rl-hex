@@ -76,7 +76,7 @@ class StateManager:
                 self.state = self.game.perform_action(self.state, action)
                 self.game.change_player()
 
-                if self.verbose and i == 100:
+                if self.verbose:
                     self.visualizer.fill_nodes(self.state.get_filled_cells())
 
             self.ANET.decay_epsilon()
@@ -92,8 +92,8 @@ class StateManager:
             """ Save model parameters """
             if (i+1) % self.save_interval == 0:
                 self.ANET.save(i+1)
-                self.print_loss_and_accuracy(
-                    self.ANET.loss, self.ANET.accuracy)
+                # self.print_loss_and_accuracy(
+                #    self.ANET.loss, self.ANET.accuracy)
 
             """ Reset game """
             self.mcts.reset(deepcopy(self.initial_state))
