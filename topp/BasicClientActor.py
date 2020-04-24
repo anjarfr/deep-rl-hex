@@ -1,10 +1,14 @@
 import math
 from topp.BasicClientActorAbs import BasicClientActorAbs
+from agent.anet import ANET
+from environment.hex import Hex
+
 
 class BasicClientActor(BasicClientActorAbs):
 
     def __init__(self, IP_address=None, verbose=True):
         self.series_id = -1
+        self.anet = ANET()
         BasicClientActorAbs.__init__(self, IP_address, verbose=verbose)
 
     def handle_get_action(self, state):
@@ -18,9 +22,13 @@ class BasicClientActor(BasicClientActorAbs):
         :return: Your actor's selected action as a tuple (row, column)
         """
 
-        # This is an example player who picks random moves. REMOVE THIS WHEN YOU ADD YOUR OWN CODE !!
-        next_move = tuple(self.pick_random_free_cell(
-            state, size=int(math.sqrt(len(state)-1))))
+        game = Hex(self.board_size, self.series_id)
+        state = game.generate_board_state(state)
+        legal_actions = game.get_legal_actions(state)
+        all_actions = state.get_cell_coords()
+        converted_state = state.get_board_state_as_list(self.series_id)
+        next_move = self.anet.choose_action(
+            converted_state, legal_actions, all_actions, 0)
         #############################
         #
         #
@@ -42,6 +50,7 @@ class BasicClientActor(BasicClientActorAbs):
 
         """
         self.series_id = series_id
+        self.board_size = game_params[0]
         #############################
         #
         #

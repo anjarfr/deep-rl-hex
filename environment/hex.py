@@ -1,12 +1,13 @@
 from environment.board import Board
 from environment.game import Game
 from copy import deepcopy
+from math import sqrt, floor
 
 
 class Hex(Game):
 
-    def __init__(self, cfg, verbose):
-        super(Hex, self).__init__(cfg, verbose)
+    def __init__(self, size, player):
+        super(Hex, self).__init__(size, player)
 
     def generate_initial_state(self, cfg):
         """
@@ -99,3 +100,27 @@ class Hex(Game):
             newset = {(r, c)}
             paths.append(newset)
         return paths
+
+    def generate_board_state(self, state):
+        """
+        Generate board state from OHT server state
+        :param state: (1 or 2, 0, 0, 0, 0 ...)
+        """
+        self.player = state[0]
+        size = floor(sqrt(state))
+        board = self.generate_initial_state(size)
+        r = 0
+        c = 0
+        for i, s in enumerate(state[1:]):
+            if s == 0:
+                fill = (0, 0)
+            elif s == 1:
+                fill = (0, 1)
+            else:
+                fill = (1, 0)
+            board.set_cell(r, c, fill)
+            c += 1
+            if c > size-1:
+                r += 1
+                c = 0
+        return board

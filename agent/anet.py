@@ -6,12 +6,19 @@ import random
 
 class ANET:
 
-    def __init__(self, cfg):
-        self.board_size = cfg["game"]["board_size"]
-        self.epsilon = cfg["nn"]["epsilon"]
-        self.epsilon_decay = cfg["nn"]["epsilon_decay"]
-        self.epochs = cfg["nn"]["epochs"]
-        self.model = NeuralNet(cfg, self.board_size)
+    def __init__(self, board_size, dims, lr, activation, optimizer, epsilon, epsilon_decay, epochs):
+        self.board_size = board_size
+        self.model = NeuralNet(
+            k=self.board_size,
+            dimensions=dims,
+            lr=lr,
+            activation=activation,
+            optimizer=optimizer
+        )
+        # --- Parameters for learning ---
+        self.epsilon = epsilon
+        self.epsilon_decay = epsilon_decay
+        self.epochs = epochs
         self.loss = []
         self.accuracy = []
 
@@ -43,11 +50,11 @@ class ANET:
         normalized = [float(i) / total for i in remove_illegal]
         return normalized
 
-    def choose_action(self, state, legal_actions, all_actions):
+    def choose_action(self, state, legal_actions, all_actions, epsilon):
         """ Returns index of chosen action """
 
         prediction = self.model(self.generate_tensor(state))
-        if random.uniform(0, 1) < self.epsilon:
+        if random.uniform(0, 1) < epsilon:
             return random.choice(legal_actions)
         else:
             legal_indexes = self.create_legal_indexes(
@@ -72,12 +79,12 @@ class ANET:
 class NeuralNet(nn.Module):
     """ Neural network """
 
-    def __init__(self, cfg, k):
+    def __init__(self, k, dimensions, lr, activation, optimizer):
         super(NeuralNet, self).__init__()
 
-        self.dimensions = cfg["nn"]["dimensions"]
-        self.learning_rate = cfg["nn"]["learning_rate"]
-        self.activation = self.get_activation(cfg["nn"]["activation_hidden"])
+        self.dimensions = dimensions
+        self.learning_rate = lr
+        self.activation = self.get_activation(activation)
 
         input_size = 2 * k ** 2 + 2
         output_size = k ** 2
@@ -101,7 +108,7 @@ class NeuralNet(nn.Module):
         self.model.apply(self.init_weights)
 
         self.optimizer = self.get_optimizer(
-            cfg["nn"]["optimizer"], list(self.model.parameters()))
+            optimizer, list(self.model.parameters()))
 
         self.loss_func = nn.BCELoss()
 
