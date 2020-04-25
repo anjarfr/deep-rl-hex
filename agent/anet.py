@@ -37,10 +37,9 @@ class ANET:
             target = self.generate_tensor(train_targets)
             prediction = self.model(state)
             loss = self.model.update(prediction, target)
-
-        print(loss)
+        accuracy = self.compute_accuracy(prediction, target)
         self.loss.append(loss)
-        self.accuracy.append(self.compute_accuracy(prediction, target))
+        self.accuracy.append(accuracy)
 
     def compute_accuracy(self, prediction, target):
         equal = prediction.argmax(dim=1).eq(target.argmax(dim=1))
@@ -111,7 +110,7 @@ class NeuralNet(nn.Module):
             layers.append(nn.Softmax(dim=-1))
         else:
             layers.append(nn.Linear(input_size, output_size))
-            layers.append(nn.Softmax(dim=-1))
+            layers.append(nn.Sigmoid(dim=-1))
 
         self.model = nn.Sequential(*layers)
         self.model.apply(self.init_weights)

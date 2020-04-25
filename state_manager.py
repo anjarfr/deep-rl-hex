@@ -90,8 +90,6 @@ class StateManager:
             """ Save model parameters """
             if (i+1) % self.save_interval == 0:
                 self.ANET.save(i+1)
-                # self.print_loss_and_accuracy(
-                #    self.ANET.loss, self.ANET.accuracy)
 
             """ Reset game """
             self.mcts.reset(deepcopy(self.initial_state))
