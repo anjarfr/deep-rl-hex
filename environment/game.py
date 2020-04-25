@@ -39,7 +39,7 @@ class Game:
     def set_player(self, player):
         self.player = player
 
-    def generate_initial_state(self, cfg):
+    def generate_initial_state(self):
         """
         :return: state of the initial game, as stated in configuration file
         """

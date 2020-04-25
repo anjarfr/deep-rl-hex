@@ -7,7 +7,7 @@ with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
 hex = Hex(cfg, True)
-state = hex.generate_initial_state(cfg)
+state = hex.generate_initial_state()
 
 state = hex.perform_action(state, (1, 1))
 hex.change_player()

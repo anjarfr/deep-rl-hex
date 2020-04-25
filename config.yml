@@ -19,10 +19,10 @@ display:
 
 agent:
   c: 1 # exploration constant
-  episodes: 300 # number of episodes
+  episodes: 200 # number of episodes
   simulations: 1000 # number of simulations (and hence rollouts) per actual game move
   m: 5 # interval of ANETs to be cached for playing TOPP
-  g: 10 # number of games played in TOPP
+  g: 25 # number of games played in TOPP
 
 nn:
   learning_rate: 0.05
@@ -31,6 +31,5 @@ nn:
   dimensions: [128, 128, 64, 64] # Number of nodes in each layer
   activation_hidden: 'relu' # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
   optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
-  save_interval: 50
   epochs: 20
   batch_size: 2000
