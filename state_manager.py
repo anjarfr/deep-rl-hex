@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from agent.anet import ANET
 from agent.buffer import ReplayBuffer
-from agent.mcts import MCTS, convert_state
+from agent.mcts import MCTS
 from environment.hex import Hex
 from environment.visualizer import Visualizer
 
@@ -90,6 +90,8 @@ class StateManager:
             """ Save model parameters """
             if (i) % self.save_interval == 0:
                 self.ANET.save(i)
+            if i+1 == self.episodes:
+                self.ANET.save(i+1)
 
             """ Reset game """
             self.mcts.reset(deepcopy(self.initial_state))

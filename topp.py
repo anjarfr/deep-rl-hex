@@ -1,9 +1,10 @@
 from environment.hex import Hex
 from environment.visualizer import Visualizer
 from agent.anet import ANET
-
+import random
 import yaml
 
+random.seed(2020)
 
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
@@ -49,7 +50,7 @@ class Topp:
                     self.play_game(i, j)
 
     def play_game(self, i, j):
-        game = Hex(self.size, 2)
+        game = Hex(self.size, 1)  # choice([1, 2]))
         state = game.generate_initial_state()
         vis = Visualizer(state, self.size, cfg["display"])
         game.change_player()
@@ -62,7 +63,7 @@ class Topp:
                     state.get_board_state_as_list(1),
                     legal_actions,
                     all_actions,
-                    0.25
+                    0.25, False
                 )
                 state = game.perform_action(state, action)
             else:
@@ -70,7 +71,7 @@ class Topp:
                     state.get_board_state_as_list(2),
                     legal_actions,
                     all_actions,
-                    0.25
+                    0.25, False
                 )
                 state = game.perform_action(state, action)
         if game.game_result() > 0:

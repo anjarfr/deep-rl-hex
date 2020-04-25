@@ -2,7 +2,7 @@ from random import randint
 from copy import copy
 import random
 
-random.seed(1337)
+#random.seed(1337)
 
 
 class Game:

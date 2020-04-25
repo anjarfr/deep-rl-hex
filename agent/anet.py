@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import random
+import numpy as np
 
 
 class ANET:
@@ -58,7 +59,7 @@ class ANET:
             return [float(i) / total for i in remove_illegal]
         return remove_illegal
 
-    def choose_action(self, state, legal_actions, all_actions, epsilon):
+    def choose_action(self, state, legal_actions, all_actions, epsilon, stochastic=False):
         """ Returns index of chosen action """
 
         prediction = self.model(self.generate_tensor(state))
@@ -66,6 +67,9 @@ class ANET:
             legal_indexes = self.create_legal_indexes(
                 all_actions, legal_actions)
             normalized = self.re_normalize(prediction, legal_indexes)
+            if stochastic:
+                index = np.random.choice(
+                    [i for i in range(len(all_actions))], p=normalized)
             index = normalized.index(max(normalized))
             if all_actions[index] in legal_actions:
                 return all_actions[index]

@@ -1,7 +1,8 @@
 from agent.node import Node
 import random
+import numpy as np
 
-random.seed(2020)
+#random.seed(2020)
 
 
 def convert_state(state, player):
@@ -42,7 +43,7 @@ class MCTS:
             self.simulate()
 
         self.game.set_player(player)
-        the_chosen_one = self.select_move(self.root, c=0)
+        the_chosen_one = self.select_move(self.root, c=0, stochastic=True)
 
         # self.root.print_tree()
 
@@ -112,16 +113,26 @@ class MCTS:
 
             # If all children have been visited already, go deeper into the tree
             else:
-                self.current_node = self.select_move(self.current_node, self.c)
+                self.current_node = self.select_move(
+                    self.current_node, self.c, stochastic=False)
                 path.append(self.current_node)
                 state = self.current_node.state
 
         return path
 
-    def select_move(self, node: Node, c: int):
+    def select_move(self, node: Node, c: int, stochastic: bool):
         """ Returns the child of input node with the best Q + U value """
 
         legal = node.actions
+
+        if stochastic:
+            distribution = np.array(self.get_probability_distribution())
+            moves = self.root.state.get_cell_coord()
+            index = np.random.choice(
+                [i for i in range(len(moves))], p=distribution)
+            action = moves[index]
+            return self.root.children[action]
+
         chosen_key = random.choice(list(node.children.keys()))
         chosen = node.children[chosen_key]
         best_value = chosen.Q() + chosen.U(c)
@@ -168,7 +179,8 @@ class MCTS:
             state=state.get_board_state_as_list(self.game.player),
             legal_actions=self.game.get_legal_actions(state),
             all_actions=state.get_cell_coord(),
-            epsilon=self.actor.epsilon
+            epsilon=self.actor.epsilon,
+            stochastic=True
         )
         for child in children:
             if child[1] == action:
