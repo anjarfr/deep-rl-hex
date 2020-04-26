@@ -7,21 +7,17 @@
 - [x] RBUF
 - [x] Finne ut hvordan illegal moves settes til 0 
 - [x] Implementere e-greedy for rollout og choose action
-- [ ] Litt randomness på target policy også (sigma)  
+- [x] Litt randomness på target policy også (sigma)  
 - [x] Finne ut hvilke variabler vi trenger i config 
 - [ ] Implementere at vi både får evaluation og prob dist som output fra ANET som vi kan bruke som critic
-- [ ] Implementere accuracy
+- [x] Implementere accuracy
 - [ ] Add rollout nodes to backprop path
-- [ ] Select actual move in MCTS use visit count
+- [x] Select actual move in MCTS use visit count
 - [x] Include current player in state from MCTS
-- [ ] Change loss back to CrossEntropy and fix tensor formats
-- [ ] Make sure its not allowed to "perform action" on an already filled cell
+- [x] Make sure its not allowed to "perform action" on an already filled cell
 
 ### TODO TOPP
-- [ ] Make sure actual games can be visualized
-
-Spørre om: 
-- [ ] Kan vi ha et critic og et actor nett? Hvis vi skal ha ett, hvordan trener vi det opp for å gjøre begge deler? 
+- [x] Make sure actual games can be visualized
 
 This project consist of four main parts: the game, the state manager, the actor and the MCTS system.
 
