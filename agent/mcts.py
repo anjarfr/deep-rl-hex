@@ -2,7 +2,7 @@ from agent.node import Node
 import random
 import numpy as np
 
-#random.seed(2020)
+random.seed(1337)
 
 
 def convert_state(state, player):
@@ -26,6 +26,7 @@ class MCTS:
         self.current_node = self.root
         self.simulations = simulations
         self.c = cfg["agent"]["c"]
+        self.epsilon = cfg["agent"]["mcts_epsilon"]
         self.actor = actor
 
     def create_root_node(self, init_state):
@@ -43,9 +44,10 @@ class MCTS:
             self.simulate()
 
         self.game.set_player(player)
-        the_chosen_one = self.select_move(self.root, c=0, stochastic=True)
+        the_chosen_one = self.select_move(self.root, c=0, stochastic=True, epsilon=self.epsilon)
+        #print("Chosen", the_chosen_one.action)
 
-        # self.root.print_tree()
+        #self.root.print_tree()
 
         distribution = self.get_probability_distribution()
         self.root = the_chosen_one
@@ -107,31 +109,35 @@ class MCTS:
             if not self.fully_expanded(self.current_node):
 
                 self.current_node = self.node_expansion(self.current_node)
-                state = self.current_node.state
                 path.append(self.current_node)
                 return path
 
             # If all children have been visited already, go deeper into the tree
             else:
-                self.current_node = self.select_move(
-                    self.current_node, self.c, stochastic=False)
+                self.current_node = self.select_move(self.current_node, self.c, stochastic=False, epsilon=0)
                 path.append(self.current_node)
                 state = self.current_node.state
 
         return path
 
-    def select_move(self, node: Node, c: int, stochastic: bool):
+    def select_move(self, node: Node, c: int, stochastic: bool, epsilon):
         """ Returns the child of input node with the best Q + U value """
 
         legal = node.actions
+        random_value = random.uniform(0, 1)
+
+        if random_value < epsilon:
+            #print("Choosing randomly!", random_value, epsilon)
+            return random.choice(list(node.children.values()))
 
         if stochastic:
             distribution = np.array(self.get_probability_distribution())
-            moves = self.root.state.get_cell_coord()
-            index = np.random.choice(
-                [i for i in range(len(moves))], p=distribution)
+            moves = node.state.get_cell_coord()
+
+            #print("Selecting for player ", self.game.player, distribution)
+            index = np.random.choice([i for i in range(len(moves))], p=distribution)
             action = moves[index]
-            return self.root.children[action]
+            return node.children[action]
 
         chosen_key = random.choice(list(node.children.keys()))
         chosen = node.children[chosen_key]
@@ -173,7 +179,7 @@ class MCTS:
         return z
 
     def default_policy(self, state):
-        """ Choose a random child state """
+        """ Choose child state based on anet """
         children = self.game.generate_child_states(state)
         action = self.actor.choose_action(
             state=state.get_board_state_as_list(self.game.player),

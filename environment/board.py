@@ -68,6 +68,13 @@ class Board:
 
         return [edge1, edge2, edge3, edge4]
 
+    def print_board(self):
+        s = ''
+        for row in self.cells:
+            for cell in row:
+                s += str(cell.state)
+        return s
+
     def get_board_state_as_list(self, player):
         """Returns the board as a list of 1s and 0s"""
         state = []

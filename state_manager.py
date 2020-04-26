@@ -44,14 +44,17 @@ class StateManager:
         epochs = cfg["nn"]["epochs"]
         lr = cfg["nn"]["learning_rate"]
         batch_size = cfg["nn"]["batch_size"]
+        max_buffer_length = cfg["nn"]["max_buffer_length"]
+        save_directory = cfg["nn"]["save_directory"]
+        load_directory = cfg["nn"]["load_directory"]
 
         self.ANET = ANET(board_size, dimensions, lr, activation,
-                         optimizer, epsilon, epsilon_decay, epochs, batch_size)
+                         optimizer, epsilon, epsilon_decay, epochs, batch_size, save_directory, load_directory)
         self.mcts = MCTS(cfg, self.sim_game, self.sim_game_state,
                          self.simulations, self.ANET)
         self.visualizer = Visualizer(
             self.initial_state, self.game.size, cfg["display"])
-        self.replay_buffer = ReplayBuffer()
+        self.replay_buffer = ReplayBuffer(max_buffer_length)
 
     def print_loss_and_accuracy(self, loss, accuracy):
         plt.plot(loss)
@@ -76,20 +79,22 @@ class StateManager:
                 self.state = self.game.perform_action(self.state, action)
                 self.game.change_player()
 
+                self.mcts.reset(deepcopy(self.state))
+
                 if self.verbose:
                     self.visualizer.fill_nodes(self.state.get_filled_cells())
-
-            self.ANET.decay_epsilon()
 
             print(i, self.ANET.epsilon)
 
             """ Train ANET """
 
             self.ANET.train(self.replay_buffer)
+            self.ANET.decay_epsilon()
 
             """ Save model parameters """
-            if (i) % self.save_interval == 0:
+            if i % self.save_interval == 0:
                 self.ANET.save(i)
+                self.print_loss_and_accuracy(self.ANET.loss, self.ANET.accuracy)
             if i+1 == self.episodes:
                 self.ANET.save(i+1)
 
