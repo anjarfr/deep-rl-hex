@@ -29,11 +29,11 @@ nn:
   learning_rate: 0.001
   epsilon: 1
   epsilon_decay: 0.99
-  dimensions: [64, 64] # Number of nodes in each layer
+  dimensions: [64, 64, 64] # Number of nodes in each layer goood: en del layers med færre eller 1 med flere 1000
   activation_hidden: 'relu' # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
   optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
   epochs: 10
-  batch_size: 64
+  batch_size: 128
   max_buffer_length: 2000
   save_directory: "size-5-board"
   load_directory: "size-5-board"
