@@ -1,9 +1,9 @@
 # |---------- Environment parameters ----------|
 
 game:
-  board_size: 3 # between 3 and 10
+  board_size: 5 # between 3 and 10
   player: 3 # starting player option, 1, 2 or 3 (mixed) Vet ikke om vi skal ha med 3 nå?
-  verbose: True # Whether the details of moves for each game is shown
+  verbose: False # Whether the details of moves for each game is shown
 
 display:
   node_size: 1500
@@ -19,22 +19,22 @@ display:
 
 agent:
   c: 1 # exploration constant
-  episodes: 300 # number of episodes
-  simulations: 1000 # number of simulations (and hence rollouts) per actual game move
-  m: 10 # interval of ANETs to be cached for playing TOPP
+  episodes: 200 # number of episodes
+  simulations: 2000 # number of simulations (and hence rollouts) per actual game move
+  m: 5 # interval of ANETs to be cached for playing TOPP
   g: 1 # number of games played in TOPP
   mcts_epsilon: 0.05
 
 nn:
-  learning_rate: 0.0008
+  learning_rate: 0.001
   epsilon: 1
   epsilon_decay: 0.99
-  dimensions: [64, 64, 64] # Number of nodes in each layer
+  dimensions: [64, 64] # Number of nodes in each layer
   activation_hidden: 'relu' # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
   optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
   epochs: 10
   batch_size: 64
   max_buffer_length: 2000
   save_directory: "size-5-board"
-  load_directory: "test-anet"
+  load_directory: "size-5-board"
 

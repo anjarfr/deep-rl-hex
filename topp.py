@@ -87,8 +87,6 @@ class Topp:
                 )
                 state = game.perform_action(state, action)
 
-            vis.fill_nodes(state.get_filled_cells())
-
             if last_game:
                 vis.fill_nodes(state.get_filled_cells())
 

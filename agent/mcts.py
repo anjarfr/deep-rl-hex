@@ -181,6 +181,9 @@ class MCTS:
     def default_policy(self, state):
         """ Choose child state based on anet """
         children = self.game.generate_child_states(state)
+
+        print(state, children)
+
         action = self.actor.choose_action(
             state=state.get_board_state_as_list(self.game.player),
             legal_actions=self.game.get_legal_actions(state),

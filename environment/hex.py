@@ -1,6 +1,6 @@
 from environment.board import Board
 from environment.game import Game
-from copy import deepcopy
+from copy import copy
 from math import sqrt, floor
 
 
@@ -72,7 +72,7 @@ class Hex(Game):
         children = []
         legal = self.get_legal_actions(board)
         for action in legal:
-            child_state = deepcopy(board)
+            child_state = copy(board)
             child_state = self.perform_action(child_state, action)
             children.append((child_state, action))
         return children
