@@ -2,7 +2,7 @@ from random import randint
 from copy import copy
 import random
 
-random.seed(1337)
+#random.seed(1337)
 
 
 class Game:
@@ -39,7 +39,7 @@ class Game:
     def set_player(self, player):
         self.player = player
 
-    def generate_initial_state(self, cfg):
+    def generate_initial_state(self):
         """
         :return: state of the initial game, as stated in configuration file
         """

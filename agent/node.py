@@ -43,13 +43,14 @@ class Node:
 
     def print_tree(self):
         children = list(self.children.values())
-        print("Root:", "state", self.state, "Avg wins", self.avg_wins, "visits", self.visits)
+        print("Root:", "state", self.state.print_board(), "Avg wins", self.avg_wins, "visits", self.visits)
 
         while len(children):
             temp_children = []
             for _ in children:
                 child = children.pop(0)
-                print("Child: ", "state ", child.state, "parent", child.parent.state, "Avg wins ", child.avg_wins, "visits ", child.visits)
+                print("Child: ", "state ", child.state.print_board(), "parent", child.parent.state.print_board(),
+                      "Avg wins ", child.avg_wins, "visits ", child.visits)
                 for temp_child in list(child.children.values()):
                     temp_children.append(temp_child)
 

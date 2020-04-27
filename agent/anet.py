@@ -2,11 +2,13 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import random
-
+import numpy as np
 
 class ANET:
 
-    def __init__(self, board_size, dims, lr, activation, optimizer, epsilon, epsilon_decay, epochs, batch_size):
+    def __init__(self, board_size, dims, lr, activation, optimizer, epsilon, epsilon_decay, epochs, batch_size,
+                 save_directory, load_directory):
+
         self.board_size = board_size
         self.model = NeuralNet(
             k=self.board_size,
@@ -22,6 +24,8 @@ class ANET:
         self.batch_size = batch_size
         self.loss = []
         self.accuracy = []
+        self.save_directory = save_directory
+        self.load_directory = load_directory
 
     def generate_tensor(self, input_list):
         tensor = torch.FloatTensor(input_list)
@@ -43,7 +47,7 @@ class ANET:
 
     def compute_accuracy(self, prediction, target):
         equal = prediction.argmax(dim=1).eq(target.argmax(dim=1))
-        return equal.sum().numpy()/len(prediction)
+        return equal.sum().numpy() / len(prediction)
 
     def create_legal_indexes(self, moves, legal):
         return [1 if move in legal else 0 for move in moves]
@@ -51,22 +55,24 @@ class ANET:
     def re_normalize(self, prediction, legal_indexes):
         """ Sets all illegal moves to 0 and renormalizes the 
         distribution """
-        remove_illegal = [a * b for a,
-                          b in zip(prediction.tolist(), legal_indexes)]
+        remove_illegal = [a * b for a, b in zip(prediction.tolist(), legal_indexes)]
         total = sum(remove_illegal)
         if total:
             return [float(i) / total for i in remove_illegal]
         return remove_illegal
 
-    def choose_action(self, state, legal_actions, all_actions, epsilon):
-        """ Returns index of chosen action """
+    def choose_action(self, state, legal_actions, all_actions, epsilon, stochastic=False):
+        """ Returns chosen action """
 
         prediction = self.model(self.generate_tensor(state))
         if random.uniform(0, 1) >= epsilon:
-            legal_indexes = self.create_legal_indexes(
-                all_actions, legal_actions)
+            legal_indexes = self.create_legal_indexes(all_actions, legal_actions)
             normalized = self.re_normalize(prediction, legal_indexes)
-            index = normalized.index(max(normalized))
+            if stochastic:
+                index = np.random.choice([i for i in range(len(all_actions))], p=normalized)
+            else:
+                # Greedy
+                index = normalized.index(max(normalized))
             if all_actions[index] in legal_actions:
                 return all_actions[index]
         return random.choice(legal_actions)
@@ -76,11 +82,10 @@ class ANET:
 
     def save(self, i):
         torch.save(
-            self.model.state_dict(), 'models/ANET_{}_size_{}'.format(i, self.board_size))
+            self.model.state_dict(), '{}/ANET_{}_size_{}'.format(self.save_directory, i, self.board_size))
 
     def load(self, i, size):
-        self.model.load_state_dict(torch.load(
-            'models/ANET_{}_size_{}'.format(i, size)))
+        self.model.load_state_dict(torch.load('{}/ANET_{}_size_{}'.format(self.load_directory, i, size)))
         self.model.eval()
 
 
@@ -110,7 +115,7 @@ class NeuralNet(nn.Module):
             layers.append(nn.Softmax(dim=-1))
         else:
             layers.append(nn.Linear(input_size, output_size))
-            layers.append(nn.Sigmoid(dim=-1))
+            layers.append(nn.Softmax(dim=-1))
 
         self.model = nn.Sequential(*layers)
         self.model.apply(self.init_weights)
@@ -122,8 +127,8 @@ class NeuralNet(nn.Module):
 
     def update(self, prediction, target):
         """ Update the gradients based on loss """
-        loss = self.loss_func(prediction, target)
         self.optimizer.zero_grad()  # Clears gradients
+        loss = self.loss_func(prediction, target)
         loss.backward()
         self.optimizer.step()
         return loss.item()

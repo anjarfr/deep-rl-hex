@@ -9,7 +9,7 @@ class Hex(Game):
     def __init__(self, size, player):
         super(Hex, self).__init__(size, player)
 
-    def generate_initial_state(self, cfg):
+    def generate_initial_state(self):
         """
         :return: state of the initial game, as stated in configuration file
         """
@@ -37,7 +37,7 @@ class Hex(Game):
             if path & self.edges[0] and path & self.edges[3]:
                 if board.cells[r][c].state == (0, 1):
                     return True
-            elif path & self.edges[1] and path & self.edges[2]:
+            if path & self.edges[1] and path & self.edges[2]:
                 if board.cells[r][c].state == (1, 0):
                     return True
         return False
@@ -72,8 +72,7 @@ class Hex(Game):
         children = []
         legal = self.get_legal_actions(board)
         for action in legal:
-            child_state = deepcopy(board)
-            child_state = self.perform_action(child_state, action)
+            child_state = self.perform_action(board, action)
             children.append((child_state, action))
         return children
 
@@ -113,7 +112,7 @@ class Hex(Game):
         """
         self.player = state[0]
         size = floor(sqrt(state))
-        board = self.generate_initial_state(size)
+        board = self.generate_initial_state()
         r = 0
         c = 0
         for i, s in enumerate(state[1:]):

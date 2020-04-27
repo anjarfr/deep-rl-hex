@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 from agent.anet import ANET
 from agent.buffer import ReplayBuffer
-from agent.mcts import MCTS, convert_state
+from agent.mcts import MCTS
 from environment.hex import Hex
 from environment.visualizer import Visualizer
 
@@ -23,15 +23,15 @@ class StateManager:
         self.anet_interval = cfg["agent"]["m"]
         self.TOPP_games = cfg["agent"]["g"]
         self.display_last_game = cfg["display"]["display_last_game"]
-        self.save_interval = cfg["nn"]["save_interval"]
+        self.save_interval = self.episodes // (cfg["agent"]["m"]-1)
 
         # -- Hex game and sim game initialization --
         board_size = cfg["game"]["board_size"]
         initial_player = cfg["game"]["player"]
         self.game = Hex(board_size, initial_player)
-        self.initial_state = self.game.generate_initial_state(cfg)
+        self.initial_state = self.game.generate_initial_state()
         self.sim_game = Hex(board_size, initial_player)
-        self.sim_game_state = self.sim_game.generate_initial_state(cfg)
+        self.sim_game_state = self.sim_game.generate_initial_state()
         self.state = deepcopy(self.initial_state)
 
         # -- ANET parameters ---
@@ -44,14 +44,17 @@ class StateManager:
         epochs = cfg["nn"]["epochs"]
         lr = cfg["nn"]["learning_rate"]
         batch_size = cfg["nn"]["batch_size"]
+        max_buffer_length = cfg["nn"]["max_buffer_length"]
+        save_directory = cfg["nn"]["save_directory"]
+        load_directory = cfg["nn"]["load_directory"]
 
         self.ANET = ANET(board_size, dimensions, lr, activation,
-                         optimizer, epsilon, epsilon_decay, epochs, batch_size)
+                         optimizer, epsilon, epsilon_decay, epochs, batch_size, save_directory, load_directory)
         self.mcts = MCTS(cfg, self.sim_game, self.sim_game_state,
                          self.simulations, self.ANET)
         self.visualizer = Visualizer(
             self.initial_state, self.game.size, cfg["display"])
-        self.replay_buffer = ReplayBuffer()
+        self.replay_buffer = ReplayBuffer(max_buffer_length)
 
     def print_loss_and_accuracy(self, loss, accuracy):
         plt.plot(loss)
@@ -76,19 +79,23 @@ class StateManager:
                 self.state = self.game.perform_action(self.state, action)
                 self.game.change_player()
 
+                self.mcts.reset(deepcopy(self.state))
+
                 if self.verbose:
                     self.visualizer.fill_nodes(self.state.get_filled_cells())
-
-            self.ANET.decay_epsilon()
 
             print(i, self.ANET.epsilon)
 
             """ Train ANET """
 
             self.ANET.train(self.replay_buffer)
+            self.ANET.decay_epsilon()
 
             """ Save model parameters """
-            if (i+1) % self.save_interval == 0:
+            if i % self.save_interval == 0:
+                self.ANET.save(i)
+                self.print_loss_and_accuracy(self.ANET.loss, self.ANET.accuracy)
+            if i+1 == self.episodes:
                 self.ANET.save(i+1)
 
             """ Reset game """
