@@ -5,12 +5,16 @@ import numpy as np
 random.seed(1337)
 
 
-def convert_state(state, player):
+def convert_state(state):
     listed_state = []
-    listed_state.extend([0, 1] if player == 1 else [1, 0])
     for row in state.cells:
         for cell in row:
-            listed_state.extend(list(cell.state))
+            if cell == (0, 1):
+                listed_state.append(1)
+            elif cell == (1, 0):
+                listed_state.append(2)
+            else:
+                listed_state.append(0)
     return listed_state
 
 
@@ -31,7 +35,8 @@ class MCTS:
 
     def create_root_node(self, init_state):
         """ Initialize the root node."""
-        node = Node(state=init_state, parent=None, action=None)
+        state = convert_state(init_state)
+        node = Node(state=state, parent=None, action=None)
         return node
 
     def uct_search(self, player):
@@ -44,10 +49,11 @@ class MCTS:
             self.simulate()
 
         self.game.set_player(player)
-        the_chosen_one = self.select_move(self.root, c=0, stochastic=True, epsilon=self.epsilon)
+        the_chosen_one = self.select_move(
+            self.root, c=0, stochastic=True, epsilon=self.epsilon)
         #print("Chosen", the_chosen_one.action)
 
-        #self.root.print_tree()
+        # self.root.print_tree()
 
         distribution = self.get_probability_distribution()
         self.root = the_chosen_one
@@ -67,7 +73,7 @@ class MCTS:
         """
         Returns whether the current node has expanded all its possible children
         """
-        actions = len(self.game.get_legal_actions(node.state))
+        actions = node.state.count(0)
         children = len(node.children)
 
         expanded = actions == children
@@ -103,7 +109,7 @@ class MCTS:
         path = [self.current_node]
         self.game.change_player()
 
-        while not self.game.game_over(state):
+        while not self.game.game_over(self.game.generate_board_state(state, mcts=True)):
             self.game.change_player()
             # If the children of the current node have not been added to the tree
             if not self.fully_expanded(self.current_node):
@@ -114,7 +120,8 @@ class MCTS:
 
             # If all children have been visited already, go deeper into the tree
             else:
-                self.current_node = self.select_move(self.current_node, self.c, stochastic=False, epsilon=0)
+                self.current_node = self.select_move(
+                    self.current_node, self.c, stochastic=False, epsilon=0)
                 path.append(self.current_node)
                 state = self.current_node.state
 
@@ -135,7 +142,8 @@ class MCTS:
             moves = node.state.get_cell_coord()
 
             #print("Selecting for player ", self.game.player, distribution)
-            index = np.random.choice([i for i in range(len(moves))], p=distribution)
+            index = np.random.choice(
+                [i for i in range(len(moves))], p=distribution)
             action = moves[index]
             return node.children[action]
 
@@ -167,12 +175,12 @@ class MCTS:
         Random simulation until termination
         Return end state, z """
         current_state = self.current_node.state
+        board = self.game.generate_board_state(current_state, mcts=True)
+        while not self.game.game_over(board):
+            current_state = self.default_policy(current_state)[0]
+            board = self.game.generate_board_state(current_state, mcts=True)
 
-        while not self.game.game_over(current_state):
-            new_state = self.default_policy(current_state)
-            current_state = new_state[0]
-
-            if not self.game.game_over(current_state):
+            if not self.game.game_over(board):
                 self.game.change_player()
 
         z = self.game.game_result()
@@ -181,16 +189,16 @@ class MCTS:
     def default_policy(self, state):
         """ Choose child state based on anet """
         children = self.game.generate_child_states(state)
-
-        print(state, children)
+        board = self.game.generate_board_state(state, mcts=True)
 
         action = self.actor.choose_action(
-            state=state.get_board_state_as_list(self.game.player),
-            legal_actions=self.game.get_legal_actions(state),
-            all_actions=state.get_cell_coord(),
+            state=board.get_board_state_as_list(self.game.player),
+            legal_actions=self.game.get_legal_actions(board),
+            all_actions=board.get_cell_coord(),
             epsilon=self.actor.epsilon,
             stochastic=True
         )
+
         for child in children:
             if child[1] == action:
                 return child

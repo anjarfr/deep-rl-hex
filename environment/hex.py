@@ -63,17 +63,20 @@ class Hex(Game):
 
         return board
 
-    def generate_child_states(self, board):
+    def generate_child_states(self, state: list):
         """
         :return: List containing tuples with all child states of given state
                  and the action taken from state to child state
                  [(child state, action to child state)]
         """
         children = []
-        legal = self.get_legal_actions(board)
-        for action in legal:
-            child_state = self.perform_action(board, action)
-            children.append((child_state, action))
+        legal = [i for i, value in enumerate(state) if value == 0]
+        board = self.generate_board_state(state)
+        actions = self.get_legal_actions(board)
+        for l in legal:
+            child_state = state.copy()
+            child_state[l] = self.player
+            children.append((child_state, actions[l]))
         return children
 
     def depth_first_search(self, board):
@@ -105,17 +108,21 @@ class Hex(Game):
             paths.append(newset)
         return paths
 
-    def generate_board_state(self, state):
+    def generate_board_state(self, state, mcts=False):
         """
         Generate board state from OHT server state
+        or MCTS state.
         :param state: (1 or 2, 0, 0, 0, 0 ...)
         """
-        self.player = state[0]
-        size = floor(sqrt(state))
+        start = 0
+        if not mcts:
+            self.player = state[0]
+            start = 1
+        size = floor(sqrt(len(state)))
         board = self.generate_initial_state()
         r = 0
         c = 0
-        for i, s in enumerate(state[1:]):
+        for i, s in enumerate(state[start:]):
             if s == 0:
                 fill = (0, 0)
             elif s == 1:

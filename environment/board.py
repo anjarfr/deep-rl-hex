@@ -78,11 +78,9 @@ class Board:
     def get_board_state_as_list(self, player):
         """Returns the board as a list of 1s and 0s"""
         state = []
-
         for row in self.cells:
             for cell in row:
                 state.extend(cell.state)
-
         if player == 1:
             return [0, 1] + state
         else:
@@ -144,4 +142,3 @@ class Cell:
 
     def is_player1(self):
         return self.state == (0, 1)
-
