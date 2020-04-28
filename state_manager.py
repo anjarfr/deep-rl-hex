@@ -1,4 +1,3 @@
-from copy import deepcopy
 import yaml
 import matplotlib.pyplot as plt
 
@@ -33,7 +32,7 @@ class StateManager:
         self.initial_state = self.game.generate_initial_state()
         self.sim_game = Hex(self.size, initial_player)
         self.sim_game_state = self.sim_game.generate_initial_state()
-        self.state = deepcopy(self.initial_state)
+        self.state = self.initial_state.copy()
 
         # -- ANET parameters ---
         epsilon_decay = cfg["nn"]["epsilon_decay"]
@@ -81,7 +80,7 @@ class StateManager:
                 self.state = self.game.perform_action(self.state, action)
                 self.game.change_player()
 
-                self.mcts.reset(deepcopy(self.state))
+                self.mcts.reset(self.state.copy())
 
                 if self.verbose:
                     board = generate_board_state(self.state, self.size)
@@ -97,14 +96,12 @@ class StateManager:
             """ Save model parameters """
             if i % self.save_interval == 0:
                 self.ANET.save(i)
-                self.print_loss_and_accuracy(
-                    self.ANET.loss, self.ANET.accuracy)
             if i+1 == self.episodes:
                 self.ANET.save(i+1)
 
             """ Reset game """
-            self.mcts.reset(deepcopy(self.initial_state))
-            self.state = deepcopy(self.initial_state)
+            self.mcts.reset(self.initial_state.copy())
+            self.state = (self.initial_state.copy())
             self.game.player = self.game.set_initial_player()
 
         self.print_loss_and_accuracy(self.ANET.loss, self.ANET.accuracy)

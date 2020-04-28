@@ -1,7 +1,7 @@
 # |---------- Environment parameters ----------|
 
 game:
-  board_size: 5 # between 3 and 10
+  board_size: 3 # between 3 and 10
   player: 3 # starting player option, 1, 2 or 3 (mixed) Vet ikke om vi skal ha med 3 nå?
   verbose: False # Whether the details of moves for each game is shown
 
