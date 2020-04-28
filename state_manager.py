@@ -32,7 +32,7 @@ class StateManager:
         self.initial_state = self.game.generate_initial_state()
         self.sim_game = Hex(self.size, initial_player)
         self.sim_game_state = self.sim_game.generate_initial_state()
-        self.state = self.initial_state.copy()
+        self.state = [*self.initial_state]
 
         # -- ANET parameters ---
         epsilon_decay = cfg["nn"]["epsilon_decay"]
@@ -80,7 +80,7 @@ class StateManager:
                 self.state = self.game.perform_action(self.state, action)
                 self.game.change_player()
 
-                self.mcts.reset(self.state.copy())
+                self.mcts.reset([*self.state])
 
                 if self.verbose:
                     board = generate_board_state(self.state, self.size)
@@ -100,8 +100,8 @@ class StateManager:
                 self.ANET.save(i+1)
 
             """ Reset game """
-            self.mcts.reset(self.initial_state.copy())
-            self.state = (self.initial_state.copy())
+            self.mcts.reset([*self.initial_state])
+            self.state = ([*self.initial_state.copy])
             self.game.player = self.game.set_initial_player()
 
         self.print_loss_and_accuracy(self.ANET.loss, self.ANET.accuracy)

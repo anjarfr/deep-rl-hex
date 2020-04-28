@@ -99,6 +99,6 @@ class Hex(Game):
         children = []
         legal = self.get_legal_actions(state)
         for action in legal:
-            child_state = self.perform_action(state.copy(), action)
+            child_state = self.perform_action([*state], action)
             children.append((child_state, action))
         return children
