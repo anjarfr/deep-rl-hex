@@ -1,17 +1,9 @@
 from agent.node import Node
+from environment.static import generate_tensor_state
 import random
 import numpy as np
 
 random.seed(1337)
-
-
-def convert_state(state, player):
-    listed_state = []
-    listed_state.extend([0, 1] if player == 1 else [1, 0])
-    for row in state.cells:
-        for cell in row:
-            listed_state.extend(list(cell.state))
-    return listed_state
 
 
 class MCTS:
@@ -44,10 +36,11 @@ class MCTS:
             self.simulate()
 
         self.game.set_player(player)
-        the_chosen_one = self.select_move(self.root, c=0, stochastic=True, epsilon=self.epsilon)
-        #print("Chosen", the_chosen_one.action)
+        the_chosen_one = self.select_move(
+            self.root, c=0, stochastic=True, epsilon=self.epsilon)
+        # print("Chosen", the_chosen_one.action)
 
-        #self.root.print_tree()
+        # self.root.print_tree()
 
         distribution = self.get_probability_distribution()
         self.root = the_chosen_one
@@ -114,7 +107,8 @@ class MCTS:
 
             # If all children have been visited already, go deeper into the tree
             else:
-                self.current_node = self.select_move(self.current_node, self.c, stochastic=False, epsilon=0)
+                self.current_node = self.select_move(
+                    self.current_node, self.c, stochastic=False, epsilon=0)
                 path.append(self.current_node)
                 state = self.current_node.state
 
@@ -122,32 +116,28 @@ class MCTS:
 
     def select_move(self, node: Node, c: int, stochastic: bool, epsilon):
         """ Returns the child of input node with the best Q + U value """
-
         legal = node.actions
         random_value = random.uniform(0, 1)
 
         if random_value < epsilon:
-            #print("Choosing randomly!", random_value, epsilon)
+            # print("Choosing randomly!", random_value, epsilon)
             return random.choice(list(node.children.values()))
 
         if stochastic:
             distribution = np.array(self.get_probability_distribution())
-            moves = node.state.get_cell_coord()
-
-            #print("Selecting for player ", self.game.player, distribution)
-            index = np.random.choice([i for i in range(len(moves))], p=distribution)
+            moves = self.game.get_all_actions(node.state)
+            # print("Selecting for player ", self.game.player, distribution)
+            index = np.random.choice(moves, p=distribution)
             action = moves[index]
             return node.children[action]
 
         chosen_key = random.choice(list(node.children.keys()))
         chosen = node.children[chosen_key]
         best_value = chosen.Q() + chosen.U(c)
-
         if self.game.player == 1:
             for action in legal:
                 current_node = node.children[action]
                 current_value = current_node.Q() + current_node.U(c)
-
                 if current_value > best_value:
                     chosen = current_node
                     best_value = current_value
@@ -155,11 +145,9 @@ class MCTS:
             for action in legal:
                 current_node = node.children[action]
                 current_value = current_node.Q() - current_node.U(c)
-
                 if current_value < best_value:
                     chosen = current_node
                     best_value = current_value
-
         return chosen
 
     def leaf_evaluation(self):
@@ -167,27 +155,20 @@ class MCTS:
         Random simulation until termination
         Return end state, z """
         current_state = self.current_node.state
-
         while not self.game.game_over(current_state):
-            new_state = self.default_policy(current_state)
-            current_state = new_state[0]
-
+            current_state = self.default_policy(current_state)[0]
             if not self.game.game_over(current_state):
                 self.game.change_player()
-
         z = self.game.game_result()
         return z
 
     def default_policy(self, state):
         """ Choose child state based on anet """
         children = self.game.generate_child_states(state)
-
-        print(state, children)
-
         action = self.actor.choose_action(
-            state=state.get_board_state_as_list(self.game.player),
-            legal_actions=self.game.get_legal_actions(state),
-            all_actions=state.get_cell_coord(),
+            state=generate_tensor_state(state, self.game.player),
+            legal=self.game.get_legal_actions(state),
+            moves=self.game.get_all_actions(state),
             epsilon=self.actor.epsilon,
             stochastic=True
         )
@@ -206,29 +187,18 @@ class MCTS:
 
     def get_probability_distribution(self):
         """ Return distribution child node visit counts from current root"""
-
-        dist_length = self.game.size ** 2
-        distribution = [0] * dist_length
-
+        distribution = [0 for _ in range(self.game.size**2)]
         # Must somehow know which index corresponds to each action
-        children = self.root.children
-        valid_actions = self.root.children.keys()
-        all_actions = self.root.state.get_cell_coord()
-
-        for action in valid_actions:
-            child = children.get(action)
-            visit_count = child.visits
-            action_index = all_actions.index(action)
-            distribution[action_index] = visit_count
-
-        normalized_distribution = self.normalize_distribution(distribution)
-        return normalized_distribution
+        legal_actions = self.root.children.keys()
+        for action in legal_actions:
+            child = self.root.children.get(action)
+            distribution[action] = child.visits
+        return self.normalize_distribution(distribution)
 
     def normalize_distribution(self, distribution):
         total = sum(distribution)
         normalized_distribution = [
             float(pred) / total for pred in distribution]
-
         return normalized_distribution
 
     def reset(self, init_state):

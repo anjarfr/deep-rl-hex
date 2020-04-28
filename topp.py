@@ -69,7 +69,7 @@ class Topp:
             print(i, j, game.player)
 
             legal_actions = game.get_legal_actions(state)
-            all_actions = state.get_cell_coord()
+            all_actions = [i for i, v in enumerate(state) if v == 0]
             if game.player == 1:
                 action = self.p1.choose_action(
                     state.get_board_state_as_list(1),

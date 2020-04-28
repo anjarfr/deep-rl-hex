@@ -20,7 +20,7 @@ display:
 agent:
   c: 1 # exploration constant
   episodes: 200 # number of episodes
-  simulations: 2000 # number of simulations (and hence rollouts) per actual game move
+  simulations: 500 # number of simulations (and hence rollouts) per actual game move
   m: 5 # interval of ANETs to be cached for playing TOPP
   g: 1 # number of games played in TOPP
   mcts_epsilon: 0.05
@@ -35,6 +35,5 @@ nn:
   epochs: 10
   batch_size: 128
   max_buffer_length: 2000
-  save_directory: "size-5-board"
-  load_directory: "size-5-board"
-
+  save_directory: 'models'
+  load_directory: 'models'
