@@ -74,18 +74,15 @@ class MCTS:
         child_states = self.game.generate_child_states(node.state)
         existing_child_actions = list(node.children.keys())
         missing_child_actions = []
-
         for sap in child_states:
             action = sap[1]
             if action not in existing_child_actions:
                 state = sap[0]
                 missing_child_actions.append((state, action))
-
         # Choose randomly between unvisited children
         chosen = random.choice(missing_child_actions)
         # Here we expand with only this chosen child
         node.expand(chosen[0], chosen[1])
-
         return node.children[chosen[1]]
 
     def tree_search(self):
@@ -94,24 +91,25 @@ class MCTS:
 
         state = self.current_node.state
         path = [self.current_node]
-        self.game.change_player()
-
-        while not self.game.game_over(state):
-            self.game.change_player()
+        game_over = self.game.game_over(state)
+        while not game_over:
             # If the children of the current node have not been added to the tree
             if not self.fully_expanded(self.current_node):
-
                 self.current_node = self.node_expansion(self.current_node)
                 path.append(self.current_node)
+                if not self.game.game_over(state):
+                    self.game.change_player()
                 return path
-
             # If all children have been visited already, go deeper into the tree
             else:
                 self.current_node = self.select_move(
                     self.current_node, self.c, stochastic=False, epsilon=0)
                 path.append(self.current_node)
                 state = self.current_node.state
-
+                if not self.game.game_over(state):
+                    self.game.change_player()
+                else:
+                    game_over = True
         return path
 
     def select_move(self, node: Node, c: int, stochastic: bool, epsilon):
@@ -155,10 +153,13 @@ class MCTS:
         Random simulation until termination
         Return end state, z """
         current_state = self.current_node.state
-        while not self.game.game_over(current_state):
-            current_state = self.default_policy(current_state)[0]
+        game_over = self.game.game_over(current_state)
+        while not game_over:
+            current_state = self.default_policy(current_state)
             if not self.game.game_over(current_state):
                 self.game.change_player()
+            else:
+                game_over = True
         z = self.game.game_result()
         return z
 
@@ -174,7 +175,7 @@ class MCTS:
         )
         for child in children:
             if child[1] == action:
-                return child
+                return child[0]
         return None
 
     def backpropagate(self, path: list, z: int):

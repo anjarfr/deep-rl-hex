@@ -65,6 +65,10 @@ class StateManager:
         plt.xlabel('Iteration')
         plt.show()
 
+    def print_game(self, state):
+        board = generate_board_state(state, self.size)
+        self.visualizer.fill_nodes(board.get_filled_cells())
+
     def play_game(self):
         """ One complete game """
         for i in range(self.episodes):
@@ -82,9 +86,8 @@ class StateManager:
 
                 self.mcts.reset([*self.state])
 
-                if self.verbose:
-                    board = generate_board_state(self.state, self.size)
-                    self.visualizer.fill_nodes(board.get_filled_cells())
+            if self.verbose:
+                self.print_game(self.state)
 
             print(i, self.ANET.epsilon)
 
@@ -101,7 +104,7 @@ class StateManager:
 
             """ Reset game """
             self.mcts.reset([*self.initial_state])
-            self.state = ([*self.initial_state.copy])
+            self.state = [*self.initial_state]
             self.game.player = self.game.set_initial_player()
 
         self.print_loss_and_accuracy(self.ANET.loss, self.ANET.accuracy)
