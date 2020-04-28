@@ -1,5 +1,4 @@
-import math
-from topp.BasicClientActorAbs import BasicClientActorAbs
+from BasicClientActorAbs import BasicClientActorAbs
 from agent.anet import ANET
 from environment.hex import Hex
 
@@ -54,7 +53,7 @@ class BasicClientActor(BasicClientActorAbs):
         """
         self.series_id = series_id
         self.board_size = game_params[0]
-        self.anet = self.anet.load()
+        self.anet = self.anet.load(200, 4)
         #############################
         #
         #
@@ -151,16 +150,17 @@ if __name__ == '__main__':
 
     # -- params --
     board_size = 4
-    dimensions = [1]
+    dimensions = [64, 64, 64]
     lr = 0.005
     activation = 'relu'
     optimizer = 'adam'
     epsilon = 1
     epsilon_decay = 0.97
     epochs = 3
+    batch_size = 32
 
     anet = ANET(board_size, dimensions, lr, activation,
-                optimizer, epsilon, epsilon_decay, epochs)
+                optimizer, epsilon, epsilon_decay, epochs, batch_size, 'models', 'models')
     bsa = BasicClientActor(anet=anet, verbose=True)
-    bsa.handle_get_action()
-    # bsa.connect_to_server()
+    # bsa.handle_get_action()
+    bsa.connect_to_server()
