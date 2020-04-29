@@ -19,7 +19,7 @@ display:
 agent:
   episodes: 200
   m: 5 # interval of ANETs to be cached for playing TOPP
-  g: 1 # number of games played in TOPP
+  g: 25 # number of games played in TOPP
 
 nn:
   learning_rate: 0.0005

@@ -44,11 +44,11 @@ class Hex(Game):
         paths = self.depth_first_search(state)
         for path in paths:
             i = next(iter(path))
-            if path & self.edges[0] and path & self.edges[3]:
-                if state[i] == 1:
+            if state[i] == 2:
+                if path.intersection(self.edges[0]) and path.intersection(self.edges[3]):
                     return True
-            if path & self.edges[1] and path & self.edges[2]:
-                if state[i] == 2:
+            if state[i] == 1:
+                if path.intersection(self.edges[1]) and path.intersection(self.edges[2]):
                     return True
         return False
 
