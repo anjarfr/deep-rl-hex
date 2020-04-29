@@ -68,6 +68,15 @@ class StateManager:
         plt.plot(accuracy)
         plt.ylabel("Accuracy")
         plt.xlabel("Iteration")
+        title = "LR{}_Epoch{}_dims{}_mbs{}_bs{}_ed{}".format(
+            config.learning_rate,
+            config.epochs,
+            config.dimensions,
+            config.max_buffer_length,
+            config.batch_size,
+            config.epsilon_decay
+        )
+        plt.title(title)
         plt.show()
 
     def print_game(self, state):
