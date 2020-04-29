@@ -16,7 +16,7 @@ plot_window_size = 20
 
 # |------------- Agent parameters -------------|
 
-episodes = 1000  # number of episodes
+episodes = 500  # number of episodes
 simulations = (
     500  # number of simulations (and hence rollouts) per actual game move
 )
@@ -27,7 +27,7 @@ mcts_epsilon = 0.05
 
 learning_rate = 0.0005
 epsilon = 1
-epsilon_decay = 0.998
+epsilon_decay = 0.993
 dimensions = [64, 64, 64]
 # Number of nodes in each layer goood = en del layers med f�rre eller 1 med flere 1000
 activation_hidden = (
@@ -36,7 +36,7 @@ activation_hidden = (
 optimizer = "adam"  # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
 epochs = 50
 batch_size = 128
-max_buffer_length = 500
+max_buffer_length = 2500
 save_directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     episodes,
     simulations,
