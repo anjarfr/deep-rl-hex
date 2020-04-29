@@ -6,6 +6,7 @@ class Hex(Game):
 
     def __init__(self, size, player):
         super(Hex, self).__init__(size, player)
+        self.neighbors = {}
 
     def generate_initial_state(self, init_state=None):
         """
@@ -61,7 +62,11 @@ class Hex(Game):
 
     def add_to_path(self, i, state, paths):
         fill = state[i]
-        neighbors = get_neighbors(i, self.size)
+        try:
+            neighbors = self.neighbors[i]
+        except:
+            self.neighbors[i] = get_neighbors(i, self.size)
+            neighbors = self.neighbors[i]
         prev_path = None
         for n in neighbors:
             n_fill = state[n]
