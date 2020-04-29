@@ -3,20 +3,31 @@ import torch.nn as nn
 import torch.optim as optim
 import random
 import numpy as np
+import os
 
 
 class ANET:
-
-    def __init__(self, board_size, dims, lr, activation, optimizer,
-                 epsilon=None, epsilon_decay=None, epochs=None,
-                 batch_size=None, save_directory=None, load_directory=None):
+    def __init__(
+        self,
+        board_size,
+        dims,
+        lr,
+        activation,
+        optimizer,
+        epsilon=None,
+        epsilon_decay=None,
+        epochs=None,
+        batch_size=None,
+        save_directory=None,
+        load_directory=None,
+    ):
         self.board_size = board_size
         self.model = NeuralNet(
             k=self.board_size,
             dimensions=dims,
             lr=lr,
             activation=activation,
-            optimizer=optimizer
+            optimizer=optimizer,
         )
         # --- Parameters for learning ---
         self.epsilon = epsilon
@@ -56,8 +67,9 @@ class ANET:
         """ Sets all illegal moves to 0 and renormalizes the 
         distribution """
         legal_indexes = self.create_legal_indexes(legal, moves)
-        remove_illegal = [a * b for a,
-                          b in zip(prediction.tolist(), legal_indexes)]
+        remove_illegal = [
+            a * b for a, b in zip(prediction.tolist(), legal_indexes)
+        ]
         total = sum(remove_illegal)
         if total:
             return [float(i) / total for i in remove_illegal]
@@ -67,8 +79,7 @@ class ANET:
         """ Returns chosen action """
         prediction = self.model(self.generate_tensor(state))
         if random.uniform(0, 1) >= epsilon:
-            normalized = self.re_normalize(
-                prediction, legal, moves)
+            normalized = self.re_normalize(prediction, legal, moves)
             if stochastic:
                 index = np.random.choice(moves, p=normalized)
             else:
@@ -82,16 +93,30 @@ class ANET:
         self.epsilon = self.epsilon * self.epsilon_decay
 
     def save(self, i):
+        if self.save_directory:
+            try:
+                os.mkdir("models/{}".format(self.save_directory))
+            except:
+                pass
         torch.save(
-            self.model.state_dict(), 'models{}/ANET_{}_size_{}'.format(
-                '/' + self.save_directory if self.save_directory else '',
-                i, self.board_size))
+            self.model.state_dict(),
+            "models{}/ANET_{}_size_{}".format(
+                "/" + self.save_directory if self.save_directory else "",
+                i,
+                self.board_size,
+            ),
+        )
 
     def load(self, i, size):
-        self.model.load_state_dict(torch.load(
-            'models{}/ANET_{}_size_{}'.format(
-                '/' + self.load_directory if self.load_directory else '',
-                i, size)))
+        self.model.load_state_dict(
+            torch.load(
+                "models{}/ANET_{}_size_{}".format(
+                    "/" + self.load_directory if self.load_directory else "",
+                    i,
+                    size,
+                )
+            )
+        )
         self.model.eval()
 
 
@@ -111,7 +136,8 @@ class NeuralNet(nn.Module):
             layers.append(self.activation) if self.activation else None
             for i in range(len(self.dimensions) - 1):
                 layers.append(
-                    nn.Linear(self.dimensions[i], self.dimensions[i + 1]))
+                    nn.Linear(self.dimensions[i], self.dimensions[i + 1])
+                )
                 layers.append(self.activation) if self.activation else None
             layers.append(nn.Linear(self.dimensions[-1], output_size))
             layers.append(nn.Softmax(dim=-1))
@@ -121,7 +147,8 @@ class NeuralNet(nn.Module):
         self.model = nn.Sequential(*layers)
         self.model.apply(self.init_weights)
         self.optimizer = self.get_optimizer(
-            optimizer, list(self.model.parameters()))
+            optimizer, list(self.model.parameters())
+        )
         self.loss_func = nn.BCELoss()
 
     def update(self, prediction, target):
@@ -141,19 +168,21 @@ class NeuralNet(nn.Module):
             m.bias.data.fill_(0.01)
 
     def get_activation(self, activation):
-        activations = nn.ModuleDict({
-            'tanh': nn.Tanh(),
-            'sigmoid': nn.Sigmoid(),
-            'linear': None,
-            'relu': nn.ReLU(),
-        })
+        activations = nn.ModuleDict(
+            {
+                "tanh": nn.Tanh(),
+                "sigmoid": nn.Sigmoid(),
+                "linear": None,
+                "relu": nn.ReLU(),
+            }
+        )
         return activations[activation]
 
     def get_optimizer(self, optimizer, parameters):
         optimizers = {
-            'adagrad': optim.Adagrad(parameters, self.learning_rate),
-            'adam': optim.Adam(parameters, self.learning_rate),
-            'sgd': optim.SGD(parameters, self.learning_rate),
-            'rmsprop': optim.RMSprop(parameters, self.learning_rate),
+            "adagrad": optim.Adagrad(parameters, self.learning_rate),
+            "adam": optim.Adam(parameters, self.learning_rate),
+            "sgd": optim.SGD(parameters, self.learning_rate),
+            "rmsprop": optim.RMSprop(parameters, self.learning_rate),
         }
         return optimizers[optimizer]

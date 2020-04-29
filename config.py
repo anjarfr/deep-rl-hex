@@ -1,9 +1,9 @@
 # |---------- Environment parameters ----------|
-board_size = 5  # between 3 and 10
+board_size = 3  # between 3 and 10
 player = (
     3  # starting player option, 1, 2 or 3 (mixed) Vet ikke om vi skal ha med 3
 )
-verbose = True  # Whether the details of moves for each game is shown
+verbose = False  # Whether the details of moves for each game is shown
 
 node_size = 1500
 initial_color = "white"
@@ -27,7 +27,7 @@ mcts_epsilon = 0.05
 
 learning_rate = 0.0005
 epsilon = 1
-epsilon_decay = 0.98
+epsilon_decay = 0.995
 dimensions = [64, 64, 64]
 # Number of nodes in each layer goood = en del layers med f�rre eller 1 med flere 1000
 activation_hidden = (
@@ -41,7 +41,7 @@ save_directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     episodes,
     simulations,
     epochs,
-    "".join(i for i in dimensions),
+    "".join([str(i) for i in dimensions]),
     learning_rate,
     batch_size,
     max_buffer_length,
