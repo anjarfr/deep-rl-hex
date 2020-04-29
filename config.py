@@ -1,5 +1,5 @@
 # |---------- Environment parameters ----------|
-board_size = 3  # between 3 and 10
+board_size = 5  # between 3 and 10
 player = (
     3  # starting player option, 1, 2 or 3 (mixed) Vet ikke om vi skal ha med 3
 )
@@ -21,7 +21,7 @@ simulations = (
     500  # number of simulations (and hence rollouts) per actual game move
 )
 c = 1  # exploration constant
-m = 2  # interval of ANETs to be cached for playing TOPP
+m = 10  # interval of ANETs to be cached for playing TOPP
 g = 1  # number of games played in TOPP
 mcts_epsilon = 0.05
 
