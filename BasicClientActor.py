@@ -21,7 +21,6 @@ class BasicClientActor(BasicClientActorAbs):
         then you will see a 2 here throughout the entire series, whereas player 1 will see a 1.
         :return: Your actor's selected action as a tuple (row, column)
         """
-        self.board_size = 4
         game = Hex(self.board_size, state[0])
         state = state[1:]
 
@@ -47,7 +46,7 @@ class BasicClientActor(BasicClientActorAbs):
         """
         self.series_id = series_id
         self.board_size = game_params[0]
-        self.anet = self.anet.load(200, 4)
+        self.anet = self.anet.load(200, self.board_size)
         #############################
         #
         #

@@ -7,7 +7,7 @@ import yaml
 
 random.seed(2020)
 
-with open("config.yml", "r", encoding="ISO-8859-1") as ymlfile:
+with open("topp_config.yml", "r", encoding="ISO-8859-1") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
 
@@ -21,21 +21,13 @@ class Topp:
         self.g = cfg['agent']['g']
 
         # -- ANET parameters ---
-        epsilon_decay = cfg["nn"]["epsilon_decay"]
         dimensions = cfg["nn"]["dimensions"]
         activation = cfg["nn"]["activation_hidden"]
         optimizer = cfg["nn"]["optimizer"]
-        epsilon = cfg["nn"]["epsilon"]
-        epochs = cfg["nn"]["epochs"]
         lr = cfg["nn"]["learning_rate"]
-        batch_size = cfg["nn"]["batch_size"]
-        save_directory = cfg["nn"]["save_directory"]
-        load_directory = cfg["nn"]["load_directory"]
 
-        self.p1 = ANET(self.size, dimensions, lr, activation,
-                       optimizer, epsilon, epsilon_decay, epochs, batch_size, save_directory, load_directory)
-        self.p2 = ANET(self.size, dimensions, lr, activation,
-                       optimizer, epsilon, epsilon_decay, epochs, batch_size, save_directory, load_directory)
+        self.p1 = ANET(self.size, dimensions, lr, activation, optimizer)
+        self.p2 = ANET(self.size, dimensions, lr, activation, optimizer)
 
     def init_result(self, models):
         self.result = {}

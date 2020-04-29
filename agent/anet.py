@@ -100,16 +100,12 @@ class NeuralNet(nn.Module):
 
     def __init__(self, k, dimensions, lr, activation, optimizer):
         super(NeuralNet, self).__init__()
-
         self.dimensions = dimensions
         self.learning_rate = lr
         self.activation = self.get_activation(activation)
-
         input_size = 2 * k ** 2 + 2
         output_size = k ** 2
-
         layers = []
-
         if len(self.dimensions):
             layers.append(nn.Linear(input_size, self.dimensions[0]))
             layers.append(self.activation) if self.activation else None
@@ -122,13 +118,10 @@ class NeuralNet(nn.Module):
         else:
             layers.append(nn.Linear(input_size, output_size))
             layers.append(nn.Softmax(dim=-1))
-
         self.model = nn.Sequential(*layers)
         self.model.apply(self.init_weights)
-
         self.optimizer = self.get_optimizer(
             optimizer, list(self.model.parameters()))
-
         self.loss_func = nn.BCELoss()
 
     def update(self, prediction, target):
