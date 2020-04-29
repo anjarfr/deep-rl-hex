@@ -2,6 +2,7 @@ from agent.node import Node
 from environment.static import generate_tensor_state
 import random
 import numpy as np
+import config
 
 random.seed(1337)
 
@@ -11,14 +12,13 @@ class MCTS:
     Monte Carlo Tree Search
     """
 
-    def __init__(self, cfg, game, init_state, simulations, actor):
-        self.cfg = cfg
+    def __init__(self, game, init_state, simulations, actor):
         self.game = game
         self.root = self.create_root_node(init_state)
         self.current_node = self.root
         self.simulations = simulations
-        self.c = cfg["agent"]["c"]
-        self.epsilon = cfg["agent"]["mcts_epsilon"]
+        self.c = config.c
+        self.epsilon = config.mcts_epsilon
         self.actor = actor
 
     def create_root_node(self, init_state):

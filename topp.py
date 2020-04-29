@@ -3,28 +3,24 @@ from environment.visualizer import Visualizer
 from environment.static import generate_board_state, generate_tensor_state
 from agent.anet import ANET
 import random
-import yaml
+import topp_config as config
 
 random.seed(2020)
-
-with open("topp_config.yml", "r", encoding="ISO-8859-1") as ymlfile:
-    cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-
 
 class Topp:
 
     def __init__(self):
-        self.size = cfg["game"]["board_size"]
-        self.verbose = cfg["game"]["verbose"]
-        self.episodes = cfg['agent']['episodes']
-        self.m = cfg['agent']['m']
-        self.g = cfg['agent']['g']
+        self.size = config.board_size
+        self.verbose = config.verbose
+        self.episodes = config.episodes
+        self.m = config.m
+        self.g = config.g
 
         # -- ANET parameters ---
-        dimensions = cfg["nn"]["dimensions"]
-        activation = cfg["nn"]["activation_hidden"]
-        optimizer = cfg["nn"]["optimizer"]
-        lr = cfg["nn"]["learning_rate"]
+        dimensions = config.dimensions
+        activation = config.activation_hidden
+        optimizer = config.optimizer
+        lr = config.learning_rate
 
         self.p1 = ANET(self.size, dimensions, lr, activation, optimizer)
         self.p2 = ANET(self.size, dimensions, lr, activation, optimizer)
@@ -52,7 +48,7 @@ class Topp:
         game = Hex(self.size, 1)
         state = game.generate_initial_state()
         vis = Visualizer(generate_board_state(
-            state, self.size), self.size, cfg["display"])
+            state, self.size), self.size)
         game.set_player(init_player)
         game_over = game.game_over(state)
         while not game_over:

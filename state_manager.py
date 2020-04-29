@@ -1,4 +1,4 @@
-import yaml
+import config
 import matplotlib.pyplot as plt
 
 from agent.anet import ANET
@@ -8,26 +8,20 @@ from environment.hex import Hex
 from environment.visualizer import Visualizer
 from environment.static import generate_board_state, generate_tensor_state
 
-with open("config.yml", "r", encoding="ISO-8859-1") as ymlfile:
-    cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-
-
 class StateManager:
 
     def __init__(self):
         """ initialize all the shizz """
 
-        self.verbose = cfg['game']['verbose']
-        self.episodes = cfg["agent"]["episodes"]
-        self.simulations = cfg["agent"]["simulations"]
-        self.anet_interval = cfg["agent"]["m"]
-        self.TOPP_games = cfg["agent"]["g"]
-        self.display_last_game = cfg["display"]["display_last_game"]
-        self.save_interval = self.episodes // (cfg["agent"]["m"]-1)
+        self.verbose = config.verbose
+        self.episodes = config.episodes
+        self.simulations = config.simulations
+        self.display_last_game = config.display_last_game
+        self.save_interval = self.episodes // (config.m-1)
 
         # -- Hex game and sim game initialization -- 
-        self.size = cfg["game"]["board_size"]
-        initial_player = cfg["game"]["player"]
+        self.size = config.board_size
+        initial_player = config.player
         self.game = Hex(self.size, initial_player)
         self.initial_state = self.game.generate_initial_state()
         self.sim_game = Hex(self.size, initial_player)
@@ -35,26 +29,26 @@ class StateManager:
         self.state = [*self.initial_state]
 
         # -- ANET parameters ---
-        epsilon_decay = cfg["nn"]["epsilon_decay"]
-        dimensions = cfg["nn"]["dimensions"]
-        activation = cfg["nn"]["activation_hidden"]
-        optimizer = cfg["nn"]["optimizer"]
-        epsilon = cfg["nn"]["epsilon"]
-        epochs = cfg["nn"]["epochs"]
-        lr = cfg["nn"]["learning_rate"]
-        batch_size = cfg["nn"]["batch_size"]
-        max_buffer_length = cfg["nn"]["max_buffer_length"]
-        save_directory = cfg["nn"]["save_directory"]
-        load_directory = cfg["nn"]["load_directory"]
+        epsilon_decay = config.epsilon_decay
+        dimensions = config.dimensions
+        activation = config.activation_hidden
+        optimizer = config.optimizer
+        epsilon = config.epsilon
+        epochs = config.epochs
+        lr = config.learning_rate
+        batch_size = config.batch_size
+        max_buffer_length = config.max_buffer_length
+        save_directory = config.save_directory
+        load_directory = config.load_directory
 
         self.ANET = ANET(self.size, dimensions, lr, activation,
                          optimizer, epsilon, epsilon_decay, epochs, batch_size, save_directory, load_directory)
-        self.mcts = MCTS(cfg, self.sim_game, self.sim_game_state,
+        self.mcts = MCTS(self.sim_game, self.sim_game_state,
                          self.simulations, self.ANET)
 
         init_board = generate_board_state(self.initial_state, self.size)
         self.visualizer = Visualizer(
-            init_board, self.size, cfg["display"])
+            init_board, self.size)
         self.replay_buffer = ReplayBuffer(max_buffer_length)
 
     def print_loss_and_accuracy(self, loss, accuracy):

@@ -50,7 +50,7 @@ state = hex.perform_action(state, (0, 0))
 
 print(hex.game_over(state))
 
-visualizer = Visualizer(state, hex.size, cfg["display"])
+visualizer = Visualizer(state, hex.size)
 visualizer.fill_nodes(state.get_filled_cells())
 
 hex.change_player()

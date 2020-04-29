@@ -1,21 +1,22 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import config
 
 
 class Visualizer:
 
     """ Creates a graphical representation of the game state """
 
-    def __init__(self, board, size, display_options):
+    def __init__(self, board, size):
         self.board = board
         self.size = size
 
-        self.node_size = display_options["node_size"]
-        self.initial_color = display_options["initial_color"]
-        self.p1_color = display_options["p1_color"]
-        self.p2_color = display_options["p2_color"]
-        self.delay = display_options["delay"]
-        self.initial_edge_color = display_options["edge_color"]
+        self.node_size = config.node_size
+        self.initial_color = config.initial_color
+        self.p1_color = config.p1_color
+        self.p2_color = config.p2_color
+        self.delay = config.delay
+        self.initial_edge_color = config.edge_color
 
         self.nodes = self.get_nodes()
         self.positions = self.get_positions()
