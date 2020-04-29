@@ -83,14 +83,14 @@ class ANET:
 
     def save(self, i):
         torch.save(
-            self.model.state_dict(), '{}/ANET_{}_size_{}'.format(
-                self.load_directory if self.load_directory else 'models',
+            self.model.state_dict(), 'models{}/ANET_{}_size_{}'.format(
+                '/' + self.save_directory if self.save_directory else '',
                 i, self.board_size))
 
     def load(self, i, size):
         self.model.load_state_dict(torch.load(
-            '{}/ANET_{}_size_{}'.format(
-                self.load_directory if self.load_directory else 'models',
+            'models{}/ANET_{}_size_{}'.format(
+                '/' + self.load_directory if self.load_directory else '',
                 i, size)))
         self.model.eval()
 
