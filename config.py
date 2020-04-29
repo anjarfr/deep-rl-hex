@@ -27,7 +27,7 @@ mcts_epsilon = 0.05
 
 learning_rate = 0.0005
 epsilon = 1
-epsilon_decay = 0.995
+epsilon_decay = 0.998
 dimensions = [64, 64, 64]
 # Number of nodes in each layer goood = en del layers med f�rre eller 1 med flere 1000
 activation_hidden = (

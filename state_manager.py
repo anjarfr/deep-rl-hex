@@ -8,8 +8,8 @@ from environment.hex import Hex
 from environment.visualizer import Visualizer
 from environment.static import generate_board_state, generate_tensor_state
 
-class StateManager:
 
+class StateManager:
     def __init__(self):
         """ initialize all the shizz """
 
@@ -17,9 +17,9 @@ class StateManager:
         self.episodes = config.episodes
         self.simulations = config.simulations
         self.display_last_game = config.display_last_game
-        self.save_interval = self.episodes // (config.m-1)
+        self.save_interval = self.episodes // (config.m)
 
-        # -- Hex game and sim game initialization -- 
+        # -- Hex game and sim game initialization --
         self.size = config.board_size
         initial_player = config.player
         self.game = Hex(self.size, initial_player)
@@ -41,22 +41,33 @@ class StateManager:
         save_directory = config.save_directory
         load_directory = config.load_directory
 
-        self.ANET = ANET(self.size, dimensions, lr, activation,
-                         optimizer, epsilon, epsilon_decay, epochs, batch_size, save_directory, load_directory)
-        self.mcts = MCTS(self.sim_game, self.sim_game_state,
-                         self.simulations, self.ANET)
+        self.ANET = ANET(
+            self.size,
+            dimensions,
+            lr,
+            activation,
+            optimizer,
+            epsilon,
+            epsilon_decay,
+            epochs,
+            batch_size,
+            save_directory,
+            load_directory,
+        )
+        self.mcts = MCTS(
+            self.sim_game, self.sim_game_state, self.simulations, self.ANET
+        )
 
         init_board = generate_board_state(self.initial_state, self.size)
-        self.visualizer = Visualizer(
-            init_board, self.size)
+        self.visualizer = Visualizer(init_board, self.size)
         self.replay_buffer = ReplayBuffer(max_buffer_length)
 
     def print_loss_and_accuracy(self, loss, accuracy):
         plt.plot(loss)
-        plt.ylabel('Loss')
+        plt.ylabel("Loss")
         plt.plot(accuracy)
-        plt.ylabel('Accuracy')
-        plt.xlabel('Iteration')
+        plt.ylabel("Accuracy")
+        plt.xlabel("Iteration")
         plt.show()
 
     def print_game(self, state):
@@ -71,8 +82,9 @@ class StateManager:
             while not self.game.game_over(self.state):
                 """ Do simulations and choose best action """
                 distribution, action = self.mcts.uct_search(self.game.player)
-                tensor_state = generate_tensor_state(self.state,
-                                                     self.game.player)
+                tensor_state = generate_tensor_state(
+                    self.state, self.game.player
+                )
                 self.replay_buffer.add(tensor_state, distribution)
 
                 self.state = self.game.perform_action(self.state, action)
@@ -95,8 +107,8 @@ class StateManager:
                 self.ANET.save(i)
                 # self.print_loss_and_accuracy(self.ANET.loss,
                 #                              self.ANET.accuracy)
-            if i+1 == self.episodes:
-                self.ANET.save(i+1)
+            if i + 1 == self.episodes:
+                self.ANET.save(i + 1)
 
             """ Reset game """
             self.mcts.reset([*self.initial_state])

@@ -3,11 +3,17 @@ import config
 
 
 def run_multiple():
-    episodes = [2, 5, 7]
-    for e in episodes:
-        config.episodes = e
-        player = StateManager()
-        player.play_game()
+    lr = [0.0001, 0.0005, 0.001, 0.005]
+    epochs = [1, 10, 50]
+    batch_size = [64, 128]
+    for l in lr:
+        config.lr = l
+        for e in epochs:
+            config.epochs = e
+            for b in batch_size:
+                config.batch_size = b
+                player = StateManager()
+                player.play_game()
 
 
 if __name__ == "__main__":
