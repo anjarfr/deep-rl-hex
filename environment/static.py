@@ -83,3 +83,7 @@ def generate_board_state(state, size):
             r += 1
             c = 0
     return board
+
+
+def convert_row_col(i, size):
+    return (i // size, i % size)

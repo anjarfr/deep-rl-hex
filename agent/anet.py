@@ -7,8 +7,9 @@ import numpy as np
 
 class ANET:
 
-    def __init__(self, board_size, dims, lr, activation, optimizer, epsilon, epsilon_decay, epochs, batch_size,
-                 save_directory, load_directory):
+    def __init__(self, board_size, dims, lr, activation, optimizer,
+                 epsilon=None, epsilon_decay=None, epochs=None,
+                 batch_size=None, save_directory=None, load_directory=None):
         self.board_size = board_size
         self.model = NeuralNet(
             k=self.board_size,
@@ -83,11 +84,14 @@ class ANET:
     def save(self, i):
         torch.save(
             self.model.state_dict(), '{}/ANET_{}_size_{}'.format(
-                self.save_directory, i, self.board_size))
+                self.load_directory if self.load_directory else 'models',
+                i, self.board_size))
 
     def load(self, i, size):
         self.model.load_state_dict(torch.load(
-            '{}/ANET_{}_size_{}'.format(self.load_directory, i, size)))
+            '{}/ANET_{}_size_{}'.format(
+                self.load_directory if self.load_directory else 'models',
+                i, size)))
         self.model.eval()
 
 

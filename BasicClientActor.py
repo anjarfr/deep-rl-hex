@@ -1,6 +1,7 @@
 from BasicClientActorAbs import BasicClientActorAbs
 from agent.anet import ANET
 from environment.hex import Hex
+from environment.static import generate_board_state, generate_tensor_state, convert_row_col
 
 
 class BasicClientActor(BasicClientActorAbs):
@@ -20,24 +21,17 @@ class BasicClientActor(BasicClientActorAbs):
         then you will see a 2 here throughout the entire series, whereas player 1 will see a 1.
         :return: Your actor's selected action as a tuple (row, column)
         """
-
-        # game = Hex(self.board_size, self.series_id)
-        game = Hex(4, 1)
-        state = game.generate_board_state(state)
+        self.board_size = 4
+        game = Hex(self.board_size, state[0])
+        state = state[1:]
 
         legal_actions = game.get_legal_actions(state)
-        all_actions = state.get_cell_coords()
+        all_actions = game.get_all_actions(state)
 
-        converted_state = state.get_board_state_as_list(self.series_id)
+        converted_state = generate_tensor_state(state, state[0])
         next_move = self.anet.choose_action(
             converted_state, legal_actions, all_actions, 0)
-        #############################
-        #
-        #
-        # YOUR CODE HERE
-        #
-        # next_move = ???
-        ##############################
+        next_move = convert_row_col(next_move, self.board_size)
         return next_move
 
     def handle_series_start(self, unique_id, series_id, player_map, num_games, game_params):
@@ -154,13 +148,7 @@ if __name__ == '__main__':
     lr = 0.005
     activation = 'relu'
     optimizer = 'adam'
-    epsilon = 1
-    epsilon_decay = 0.97
-    epochs = 3
-    batch_size = 32
 
-    anet = ANET(board_size, dimensions, lr, activation,
-                optimizer, epsilon, epsilon_decay, epochs, batch_size, 'models', 'models')
+    anet = ANET(board_size, dimensions, lr, activation, optimizer)
     bsa = BasicClientActor(anet=anet, verbose=True)
-    # bsa.handle_get_action()
     bsa.connect_to_server()

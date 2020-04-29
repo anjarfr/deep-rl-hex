@@ -1,7 +1,7 @@
 # |---------- Environment parameters ----------|
 
 game:
-  board_size: 3 # between 3 and 10
+  board_size: 4 # between 3 and 10
   player: 3 # starting player option, 1, 2 or 3 (mixed) Vet ikke om vi skal ha med 3 nÃ¥?
   verbose: False # Whether the details of moves for each game is shown
 
@@ -26,7 +26,7 @@ agent:
   mcts_epsilon: 0.05
 
 nn:
-  learning_rate: 0.001
+  learning_rate: 0.0005
   epsilon: 1
   epsilon_decay: 0.99
   dimensions: [64, 64, 64] # Number of nodes in each layer goood: en del layers med færre eller 1 med flere 1000
@@ -34,6 +34,6 @@ nn:
   optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
   epochs: 1
   batch_size: 128
-  max_buffer_length: 2000
+  max_buffer_length: 500
   save_directory: 'models'
   load_directory: 'models'
