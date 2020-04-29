@@ -17,8 +17,8 @@ display:
 # |------------- Agent parameters -------------|
 
 agent:
-  episodes: 200
-  m: 5 # interval of ANETs to be cached for playing TOPP
+  episodes: 1000
+  m: 2 # interval of ANETs to be cached for playing TOPP
   g: 25 # number of games played in TOPP
 
 nn:

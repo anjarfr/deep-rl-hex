@@ -99,8 +99,8 @@ class StateManager:
             """ Save model parameters """
             if i % self.save_interval == 0:
                 self.ANET.save(i)
-                self.print_loss_and_accuracy(self.ANET.loss,
-                                             self.ANET.accuracy)
+                # self.print_loss_and_accuracy(self.ANET.loss,
+                #                              self.ANET.accuracy)
             if i+1 == self.episodes:
                 self.ANET.save(i+1)
 

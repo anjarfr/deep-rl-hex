@@ -33,6 +33,9 @@ class Topp:
         self.result = {}
         for i in models:
             self.result[i] = 0
+    
+    def one_vs_one(self, p1, p2):
+        pass
 
     def round_robin(self):
         step = self.episodes // (self.m - 1)
@@ -61,7 +64,7 @@ class Topp:
                     generate_tensor_state(state, 1),
                     legal_actions,
                     all_actions,
-                    0, False
+                    0, False 
                 )
                 state = game.perform_action(state, action)
             else:
