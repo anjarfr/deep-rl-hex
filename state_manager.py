@@ -25,7 +25,7 @@ class StateManager:
         self.display_last_game = cfg["display"]["display_last_game"]
         self.save_interval = self.episodes // (cfg["agent"]["m"]-1)
 
-        # -- Hex game and sim game initialization --
+        # -- Hex game and sim game initialization -- 
         self.size = cfg["game"]["board_size"]
         initial_player = cfg["game"]["player"]
         self.game = Hex(self.size, initial_player)
@@ -99,6 +99,8 @@ class StateManager:
             """ Save model parameters """
             if i % self.save_interval == 0:
                 self.ANET.save(i)
+                self.print_loss_and_accuracy(self.ANET.loss,
+                                             self.ANET.accuracy)
             if i+1 == self.episodes:
                 self.ANET.save(i+1)
 
