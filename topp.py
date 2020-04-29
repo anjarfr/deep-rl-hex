@@ -7,8 +7,8 @@ import topp_config as config
 
 random.seed(2020)
 
-class Topp:
 
+class Topp:
     def __init__(self):
         self.size = config.board_size
         self.verbose = config.verbose
@@ -30,25 +30,26 @@ class Topp:
         for i in models:
             self.result[i] = 0
 
+    def one_vs_one(self, p1, p2):
+        pass
+
     def round_robin(self):
         step = self.episodes // (self.m - 1)
-        models = [i for i in range(0, self.episodes+1, step)]
-        init_player = 1
+        models = [i for i in range(0, self.episodes + 1, step)]
+        init_player = 3
         self.init_result(models)
 
         for i in models:
             self.p1.load(i, self.size)
-            for j in range(i+step, self.episodes+1, step):
+            for j in range(i + step, self.episodes + 1, step):
                 self.p2.load(j, self.size)
                 for k in range(self.g):
-                    init_player = 3 - init_player
-                    self.play_game(i, j, init_player, k == self.g-1)
+                    self.play_game(i, j, init_player, k == self.g - 1)
 
     def play_game(self, i, j, init_player, last_game):
-        game = Hex(self.size, 1)
+        game = Hex(self.size, init_player)
         state = game.generate_initial_state()
-        vis = Visualizer(generate_board_state(
-            state, self.size), self.size)
+        vis = Visualizer(generate_board_state(state, self.size), self.size)
         game.set_player(init_player)
         game_over = game.game_over(state)
         while not game_over:
@@ -59,7 +60,8 @@ class Topp:
                     generate_tensor_state(state, 1),
                     legal_actions,
                     all_actions,
-                    0, False
+                    0,
+                    False,
                 )
                 state = game.perform_action(state, action)
             else:
@@ -67,7 +69,8 @@ class Topp:
                     generate_tensor_state(state, 2),
                     legal_actions,
                     all_actions,
-                    0, False
+                    0,
+                    False,
                 )
                 state = game.perform_action(state, action)
             if game.game_over(state):
@@ -77,7 +80,7 @@ class Topp:
         # if last_game:
         #     board = generate_board_state(state, self.size)
         #     vis.fill_nodes(board.get_filled_cells())
-        print(game.game_result())
+
         if game.game_result() > 0:
             self.result[i] += 1
         else:
@@ -85,8 +88,11 @@ class Topp:
 
     def print_result(self):
         for model, result in self.result.items():
-            print("{}: {:.1f}%".format(model,
-                                       100*result/(self.g * (self.m-1))))
+            print(
+                "{}: {:.1f}%".format(
+                    model, 100 * result / (self.g * (self.m - 1))
+                )
+            )
 
 
 if __name__ == "__main__":
