@@ -35,7 +35,7 @@ activation_hidden = (
 )
 optimizer = "adam"  # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
 epochs = 50
-batch_size = 32
+batch_size = 128
 max_buffer_length = 500
 save_directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     episodes,
