@@ -3,7 +3,8 @@ import config
 
 
 def run_multiple():
-    lr = [0.0001, 0.0005, 0.001, 0.005]
+    config.episodes = 1000  # 500
+    lr = 0.0001  # [0.0001, 0.0005, 0.001, 0.005]
     epochs = [1, 10, 50]
     batch_size = [64, 128]
     for l in lr:
