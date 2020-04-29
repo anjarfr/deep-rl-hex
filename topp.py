@@ -5,8 +5,6 @@ from agent.anet import ANET
 import random
 import yaml
 
-random.seed(2020)
-
 with open("topp_config.yml", "r", encoding="ISO-8859-1") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
@@ -25,9 +23,10 @@ class Topp:
         activation = cfg["nn"]["activation_hidden"]
         optimizer = cfg["nn"]["optimizer"]
         lr = cfg["nn"]["learning_rate"]
+        load_directory = cfg["nn"]["load_directory"]
 
-        self.p1 = ANET(self.size, dimensions, lr, activation, optimizer)
-        self.p2 = ANET(self.size, dimensions, lr, activation, optimizer)
+        self.blue = ANET(self.size, dimensions, lr, activation, optimizer, load_directory=load_directory)
+        self.green = ANET(self.size, dimensions, lr, activation, optimizer, load_directory=load_directory)
 
     def init_result(self, models):
         self.result = {}
@@ -37,29 +36,34 @@ class Topp:
     def round_robin(self):
         step = self.episodes // (self.m - 1)
         models = [i for i in range(0, self.episodes+1, step)]
-        init_player = 1
+        init_player = 3
         self.init_result(models)
 
         for i in models:
-            self.p1.load(i, self.size)
+            self.blue.load(i, self.size)
             for j in range(i+step, self.episodes+1, step):
-                self.p2.load(j, self.size)
+                self.green.load(j, self.size)
                 for k in range(self.g):
-                    init_player = 3 - init_player
                     self.play_game(i, j, init_player, k == self.g-1)
 
     def play_game(self, i, j, init_player, last_game):
-        game = Hex(self.size, 1)
+
+        game = Hex(self.size, init_player)
         state = game.generate_initial_state()
-        vis = Visualizer(generate_board_state(
-            state, self.size), self.size, cfg["display"])
-        game.set_player(init_player)
+        vis = Visualizer(generate_board_state(state, self.size), self.size, cfg["display"])
         game_over = game.game_over(state)
+
+        if game.player == 1:
+            print("BLUE STARTS: ", i)
+        else:
+            print("GREEN STARTS: ", j)
+
         while not game_over:
             legal_actions = game.get_legal_actions(state)
             all_actions = game.get_legal_actions(state)
+
             if game.player == 1:
-                action = self.p1.choose_action(
+                action = self.blue.choose_action(
                     generate_tensor_state(state, 1),
                     legal_actions,
                     all_actions,
@@ -67,7 +71,7 @@ class Topp:
                 )
                 state = game.perform_action(state, action)
             else:
-                action = self.p2.choose_action(
+                action = self.green.choose_action(
                     generate_tensor_state(state, 2),
                     legal_actions,
                     all_actions,
@@ -78,10 +82,11 @@ class Topp:
                 game_over = True
             else:
                 game.change_player()
-        # if last_game:
-        #     board = generate_board_state(state, self.size)
-        #     vis.fill_nodes(board.get_filled_cells())
-        print(game.game_result())
+
+            if last_game:
+                board = generate_board_state(state, self.size)
+                vis.fill_nodes(board.get_filled_cells())
+
         if game.game_result() > 0:
             self.result[i] += 1
         else:

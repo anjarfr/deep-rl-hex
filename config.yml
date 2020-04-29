@@ -20,20 +20,20 @@ display:
 agent:
   c: 1 # exploration constant
   episodes: 200 # number of episodes
-  simulations: 1000 # number of simulations (and hence rollouts) per actual game move
-  m: 5 # interval of ANETs to be cached for playing TOPP
+  simulations: 500 # number of simulations (and hence rollouts) per actual game move
+  m: 6 # interval of ANETs to be cached for playing TOPP
   g: 1 # number of games played in TOPP
-  mcts_epsilon: 0.05
+  mcts_epsilon: 0
 
 nn:
-  learning_rate: 0.0005
+  learning_rate: 0.01
   epsilon: 1
   epsilon_decay: 0.97
-  dimensions: [64, 64, 64] # Number of nodes in each layer goood: en del layers med færre eller 1 med flere 1000
+  dimensions: [128, 96, 64] # Number of nodes in each layer goood: en del layers med frre eller 1 med flere 1000
   activation_hidden: 'relu' # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
   optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
-  epochs: 10
+  epochs: 1
   batch_size: 128
-  max_buffer_length: 500
-  save_directory: 'models'
-  load_directory: 'models'
+  max_buffer_length: 5000
+  save_directory: 'new-models'
+  load_directory: 'new-models'
