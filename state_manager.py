@@ -1,4 +1,3 @@
-from copy import deepcopy
 import yaml
 import matplotlib.pyplot as plt
 
@@ -7,8 +6,9 @@ from agent.buffer import ReplayBuffer
 from agent.mcts import MCTS
 from environment.hex import Hex
 from environment.visualizer import Visualizer
+from environment.static import generate_board_state, generate_tensor_state
 
-with open("config.yml", "r") as ymlfile:
+with open("config.yml", "r", encoding="ISO-8859-1") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
 
@@ -26,16 +26,15 @@ class StateManager:
         self.save_interval = self.episodes // (cfg["agent"]["m"]-1)
 
         # -- Hex game and sim game initialization --
-        board_size = cfg["game"]["board_size"]
+        self.size = cfg["game"]["board_size"]
         initial_player = cfg["game"]["player"]
-        self.game = Hex(board_size, initial_player)
+        self.game = Hex(self.size, initial_player)
         self.initial_state = self.game.generate_initial_state()
-        self.sim_game = Hex(board_size, initial_player)
+        self.sim_game = Hex(self.size, initial_player)
         self.sim_game_state = self.sim_game.generate_initial_state()
-        self.state = deepcopy(self.initial_state)
+        self.state = [*self.initial_state]
 
         # -- ANET parameters ---
-        board_size = cfg["game"]["board_size"]
         epsilon_decay = cfg["nn"]["epsilon_decay"]
         dimensions = cfg["nn"]["dimensions"]
         activation = cfg["nn"]["activation_hidden"]
@@ -48,12 +47,14 @@ class StateManager:
         save_directory = cfg["nn"]["save_directory"]
         load_directory = cfg["nn"]["load_directory"]
 
-        self.ANET = ANET(board_size, dimensions, lr, activation,
+        self.ANET = ANET(self.size, dimensions, lr, activation,
                          optimizer, epsilon, epsilon_decay, epochs, batch_size, save_directory, load_directory)
         self.mcts = MCTS(cfg, self.sim_game, self.sim_game_state,
                          self.simulations, self.ANET)
+
+        init_board = generate_board_state(self.initial_state, self.size)
         self.visualizer = Visualizer(
-            self.initial_state, self.game.size, cfg["display"])
+            init_board, self.size, cfg["display"])
         self.replay_buffer = ReplayBuffer(max_buffer_length)
 
     def print_loss_and_accuracy(self, loss, accuracy):
@@ -64,6 +65,10 @@ class StateManager:
         plt.xlabel('Iteration')
         plt.show()
 
+    def print_game(self, state):
+        board = generate_board_state(state, self.size)
+        self.visualizer.fill_nodes(board.get_filled_cells())
+
     def play_game(self):
         """ One complete game """
         for i in range(self.episodes):
@@ -72,17 +77,17 @@ class StateManager:
             while not self.game.game_over(self.state):
                 """ Do simulations and choose best action """
                 distribution, action = self.mcts.uct_search(self.game.player)
-                current_state_with_player = self.state.get_board_state_as_list(
-                    self.game.player)
-                self.replay_buffer.add(current_state_with_player, distribution)
+                tensor_state = generate_tensor_state(self.state,
+                                                     self.game.player)
+                self.replay_buffer.add(tensor_state, distribution)
 
                 self.state = self.game.perform_action(self.state, action)
                 self.game.change_player()
 
-                self.mcts.reset(deepcopy(self.state))
+                self.mcts.reset([*self.state])
 
-                if self.verbose:
-                    self.visualizer.fill_nodes(self.state.get_filled_cells())
+            if self.verbose:
+                self.print_game(self.state)
 
             print(i, self.ANET.epsilon)
 
@@ -94,13 +99,12 @@ class StateManager:
             """ Save model parameters """
             if i % self.save_interval == 0:
                 self.ANET.save(i)
-                self.print_loss_and_accuracy(self.ANET.loss, self.ANET.accuracy)
             if i+1 == self.episodes:
                 self.ANET.save(i+1)
 
             """ Reset game """
-            self.mcts.reset(deepcopy(self.initial_state))
-            self.state = deepcopy(self.initial_state)
+            self.mcts.reset([*self.initial_state])
+            self.state = [*self.initial_state]
             self.game.player = self.game.set_initial_player()
 
         self.print_loss_and_accuracy(self.ANET.loss, self.ANET.accuracy)

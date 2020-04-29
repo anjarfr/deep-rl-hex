@@ -144,4 +144,3 @@ class Cell:
 
     def is_player1(self):
         return self.state == (0, 1)
-

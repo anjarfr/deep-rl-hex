@@ -2,7 +2,6 @@
 
 game:
   board_size: 4 # between 3 and 10
-  player: 3 # starting player option, 1, 2 or 3 (mixed) Vet ikke om vi skal ha med 3
   verbose: False # Whether the details of moves for each game is shown
 
 display:
@@ -18,22 +17,14 @@ display:
 # |------------- Agent parameters -------------|
 
 agent:
-  c: 1 # exploration constant
-  episodes: 200 # number of episodes
-  simulations: 500 # number of simulations (and hence rollouts) per actual game move
+  episodes: 200
   m: 5 # interval of ANETs to be cached for playing TOPP
   g: 1 # number of games played in TOPP
-  mcts_epsilon: 0.05
 
 nn:
   learning_rate: 0.0005
-  epsilon: 1
-  epsilon_decay: 0.97
-  dimensions: [64, 64, 64] # Number of nodes in each layer goood: en del layers med færre eller 1 med flere 1000
+  dimensions: [64, 64, 64] # Number of nodes in each layer goood: en del layers med fÃ¦rre eller 1 med flere 1000
   activation_hidden: 'relu' # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
   optimizer: 'adam' # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
-  epochs: 1
-  batch_size: 128
-  max_buffer_length: 500
   save_directory: 'models'
   load_directory: 'models'
