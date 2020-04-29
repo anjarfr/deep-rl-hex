@@ -54,8 +54,8 @@ class Topp:
         vis = Visualizer(generate_board_state(
             state, self.size), self.size, cfg["display"])
         game.set_player(init_player)
-        while not game.game_over(state):
-            game.change_player()
+        game_over = game.game_over(state)
+        while not game_over:
             legal_actions = game.get_legal_actions(state)
             all_actions = game.get_legal_actions(state)
             if game.player == 1:
@@ -74,9 +74,14 @@ class Topp:
                     0, False
                 )
                 state = game.perform_action(state, action)
+            if game.game_over(state):
+                game_over = True
+            else:
+                game.change_player()
         # if last_game:
         #     board = generate_board_state(state, self.size)
         #     vis.fill_nodes(board.get_filled_cells())
+        print(game.game_result())
         if game.game_result() > 0:
             self.result[i] += 1
         else:
