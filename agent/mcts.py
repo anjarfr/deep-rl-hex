@@ -171,7 +171,7 @@ class MCTS:
             legal=self.game.get_legal_actions(state),
             moves=self.game.get_all_actions(state),
             epsilon=self.actor.epsilon,
-            stochastic=True
+            stochastic=False
         )
         for child in children:
             if child[1] == action:
