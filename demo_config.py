@@ -31,7 +31,7 @@ max_buffer_length = 4000
 start = 1000
 stop = -2
 step = -200
-choose_models = True
+choose_models = False
 
 directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     episodes,
@@ -43,4 +43,4 @@ directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     max_buffer_length,
 )
 
-load_directory = directory
+load_directory = 'demo'
