@@ -22,8 +22,10 @@ class Topp:
         optimizer = config.optimizer
         lr = config.learning_rate
 
-        self.p1 = ANET(self.size, dimensions, lr, activation, optimizer)
-        self.p2 = ANET(self.size, dimensions, lr, activation, optimizer)
+        load = config.load_directory
+
+        self.p1 = ANET(self.size, dimensions, lr, activation, optimizer, load_directory=load)
+        self.p2 = ANET(self.size, dimensions, lr, activation, optimizer, load_directory=load)
 
     def init_result(self, models):
         self.result = {}

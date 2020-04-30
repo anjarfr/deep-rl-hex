@@ -37,13 +37,13 @@ class MCTS:
 
         self.game.set_player(player)
         the_chosen_one = self.select_move(
-            self.root, c=0, stochastic=True, epsilon=self.epsilon)
-        # print("Chosen", the_chosen_one.action)
+            self.root, c=0, stochastic=False, epsilon=self.epsilon)
 
         # self.root.print_tree()
 
         distribution = self.get_probability_distribution()
         self.root = the_chosen_one
+        #print("Chosen", the_chosen_one.action)
 
         return distribution, the_chosen_one.action
 
@@ -171,7 +171,7 @@ class MCTS:
             legal=self.game.get_legal_actions(state),
             moves=self.game.get_all_actions(state),
             epsilon=self.actor.epsilon,
-            stochastic=True
+            stochastic=False
         )
         for child in children:
             if child[1] == action:
