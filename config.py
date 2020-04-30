@@ -25,7 +25,7 @@ m = 10  # interval of ANETs to be cached for playing TOPP
 g = 1  # number of games played in TOPP
 mcts_epsilon = 0
 
-learning_rate = 0.0005
+learning_rate = 0.005
 epsilon = 1
 epsilon_decay = 0.98
 dimensions = [64, 64, 64]
