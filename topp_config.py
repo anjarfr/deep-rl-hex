@@ -24,11 +24,11 @@ optimizer = "adam"
 
 episodes = 500  # number of episodes
 simulations = 500
-epochs = 10
-dimensions = [128, 96, 64]
-learning_rate = 0.001
-batch_size = 256
-max_buffer_length = 5000
+epochs = 50
+dimensions = [64, 64, 64]
+learning_rate = 0.0005
+batch_size = 128
+max_buffer_length = 2500
 
 save_directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     episodes,
