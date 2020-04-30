@@ -4,6 +4,7 @@ player = (
     3  # starting player option, 1, 2 or 3 (mixed) Vet ikke om vi skal ha med 3
 )
 verbose = False  # Whether the details of moves for each game is shown
+stochastic = False
 
 node_size = 1500
 initial_color = "white"

@@ -1,7 +1,7 @@
 # |---------- Environment parameters ----------|
 board_size = 5  # between 3 and 10
-player = 3
-verbose = True  # Whether the details of moves for each game is shown
+player = 2
+verbose = False  # Whether the details of moves for each game is shown
 
 node_size = 1500
 initial_color = "white"
@@ -21,16 +21,16 @@ activation_hidden = "relu"
 optimizer = "adam"
 
 episodes = 200  # number of episodes
-simulations = 400
+simulations = 500
 epochs = 50
-dimensions = [128, 128, 64, 64]
+dimensions = [64, 32, 32]
 learning_rate = 0.0005
 batch_size = 32
 max_buffer_length = 5000
 
 start = 0
-stop = 50
-step = 50
+stop = 60
+step = 10
 choose_models = True
 
 save_directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
