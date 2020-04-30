@@ -14,7 +14,7 @@ plot_window_size = 20
 
 # |------------- Agent parameters -------------|
 
-m = 10  # interval of ANETs to be cached for playing TOPP
+m = 5  # interval of ANETs to be cached for playing TOPP
 g = 25  # number of games played in TOPP
 
 activation_hidden = "relu"
@@ -28,9 +28,9 @@ learning_rate = 0.0005
 batch_size = 128
 max_buffer_length = 500
 
-start = 0
-stop = 100
-step = 50
+start = 500
+stop = -2
+step = -100
 choose_models = False
 
 directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
@@ -40,8 +40,7 @@ directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     "".join([str(i) for i in dimensions]),
     learning_rate,
     batch_size,
-
     max_buffer_length,
 )
 
-load_directory = directory
+load_directory = 'demo'

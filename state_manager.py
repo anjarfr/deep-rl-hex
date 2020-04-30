@@ -101,8 +101,8 @@ class StateManager:
 
                 self.mcts.reset([*self.state])
 
-            if self.verbose:
-                self.print_game(self.state)
+                if self.verbose:
+                    self.print_game(self.state)
 
             print(i, self.ANET.epsilon)
 
