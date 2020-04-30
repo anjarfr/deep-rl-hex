@@ -43,4 +43,4 @@ directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     max_buffer_length,
 )
 
-load_directory = directory
+load_directory = 'demo'
