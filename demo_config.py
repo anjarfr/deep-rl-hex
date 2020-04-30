@@ -22,15 +22,15 @@ optimizer = "adam"
 
 episodes = 1000  # number of episodes
 simulations = 500
-epochs = 20
-dimensions = [64, 32, 32]
-learning_rate = 0.0008
+epochs = 50
+dimensions = [64, 64, 64]
+learning_rate = 0.0005
 batch_size = 128
-max_buffer_length = 4000
+max_buffer_length = 500
 
-start = 1000
+start = 500
 stop = -2
-step = -200
+step = -100
 choose_models = False
 
 directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
@@ -43,4 +43,4 @@ directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     max_buffer_length,
 )
 
-load_directory = 'demo'
+load_directory = directory

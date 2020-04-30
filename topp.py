@@ -3,9 +3,9 @@ from environment.visualizer import Visualizer
 from environment.static import generate_board_state, generate_tensor_state
 from agent.anet import ANET
 import random
-import topp_config as config
+import demo_config as config
 
-random.seed(2020)
+# random.seed(2020)
 
 
 class Topp:
