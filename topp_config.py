@@ -1,7 +1,7 @@
 # |---------- Environment parameters ----------|
 board_size = 5  # between 3 and 10
 player = 3
-verbose = True  # Whether the details of moves for each game is shown
+verbose = False  # Whether the details of moves for each game is shown
 
 node_size = 1500
 initial_color = "white"
@@ -29,9 +29,9 @@ batch_size = 32
 max_buffer_length = 5000
 
 start = 0
-stop = 50
+stop = 100
 step = 50
-choose_models = True
+choose_models = False
 
 save_directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     episodes,
@@ -40,6 +40,7 @@ save_directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     "".join([str(i) for i in dimensions]),
     learning_rate,
     batch_size,
+
     max_buffer_length,
 )
 
