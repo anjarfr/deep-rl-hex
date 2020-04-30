@@ -1,6 +1,6 @@
 # |---------- Environment parameters ----------|
 board_size = 5  # between 3 and 10
-player = 2
+player = 3
 verbose = False  # Whether the details of moves for each game is shown
 
 node_size = 1500
@@ -14,26 +14,26 @@ plot_window_size = 20
 
 # |------------- Agent parameters -------------|
 
-m = 4  # interval of ANETs to be cached for playing TOPP
+m = 10  # interval of ANETs to be cached for playing TOPP
 g = 25  # number of games played in TOPP
 
 activation_hidden = "relu"
 optimizer = "adam"
 
-episodes = 200  # number of episodes
+episodes = 1000  # number of episodes
 simulations = 500
-epochs = 50
+epochs = 20
 dimensions = [64, 32, 32]
-learning_rate = 0.0005
-batch_size = 32
-max_buffer_length = 5000
+learning_rate = 0.0008
+batch_size = 128
+max_buffer_length = 4000
 
 start = 0
-stop = 60
-step = 10
-choose_models = True
+stop = 600
+step = 100
+choose_models = False
 
-save_directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
+directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     episodes,
     simulations,
     epochs,
@@ -43,4 +43,4 @@ save_directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     max_buffer_length,
 )
 
-load_directory = save_directory
+load_directory = 'demo'
