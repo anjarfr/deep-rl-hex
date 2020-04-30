@@ -1,9 +1,7 @@
 # |---------- Environment parameters ----------|
 board_size = 5  # between 3 and 10
-player = (
-    3  # starting player option, 1, 2 or 3 (mixed) Vet ikke om vi skal ha med 3
-)
-verbose = False  # Whether the details of moves for each game is shown
+player = 3
+verbose = True  # Whether the details of moves for each game is shown
 
 node_size = 1500
 initial_color = "white"
@@ -22,13 +20,13 @@ g = 25  # number of games played in TOPP
 activation_hidden = "relu"
 optimizer = "adam"
 
-episodes = 500  # number of episodes
+episodes = 1000  # number of episodes
 simulations = 500
-epochs = 50
-dimensions = [64, 64, 64]
-learning_rate = 0.0005
+epochs = 20
+dimensions = [64, 32, 32]
+learning_rate = 0.0008
 batch_size = 128
-max_buffer_length = 2500
+max_buffer_length = 4000
 
 save_directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     episodes,

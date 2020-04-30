@@ -39,7 +39,7 @@ class Topp:
     def round_robin(self):
         step = self.episodes // (self.m)
         models = [i for i in range(0, self.episodes + 1, step)]
-        init_player = 3
+        init_player = config.player
         self.init_result(models)
 
         for i in models:
@@ -53,7 +53,6 @@ class Topp:
         game = Hex(self.size, init_player)
         state = game.generate_initial_state()
         vis = Visualizer(generate_board_state(state, self.size), self.size)
-        game.set_player(init_player)
         game_over = game.game_over(state)
         while not game_over:
             legal_actions = game.get_legal_actions(state)
@@ -80,9 +79,10 @@ class Topp:
                 game_over = True
             else:
                 game.change_player()
-        # if last_game:
-        #     board = generate_board_state(state, self.size)
-        #     vis.fill_nodes(board.get_filled_cells())
+            if self.verbose:
+                if last_game:
+                    board = generate_board_state(state, self.size)
+                    vis.fill_nodes(board.get_filled_cells())
 
         if game.game_result() > 0:
             self.result[i] += 1
