@@ -21,9 +21,9 @@ activation_hidden = "relu"
 optimizer = "adam"
 
 episodes = 200  # number of episodes
-simulations = 400
+simulations = 500
 epochs = 50
-dimensions = [128, 128, 64, 64]
+dimensions = [64, 32, 32]
 learning_rate = 0.0005
 batch_size = 32
 max_buffer_length = 5000

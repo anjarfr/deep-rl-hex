@@ -37,7 +37,7 @@ class MCTS:
 
         self.game.set_player(player)
         the_chosen_one = self.select_move(
-            self.root, c=0, stochastic=True, epsilon=self.epsilon)
+            self.root, c=0, stochastic=config.stochastic, epsilon=self.epsilon)
         # print("Chosen", the_chosen_one.action)
 
         # self.root.print_tree()
