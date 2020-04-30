@@ -33,8 +33,17 @@ class Topp:
         for i in models:
             self.result[i] = 0
 
-    def one_vs_one(self, p1, p2):
-        pass
+    def choose_models(self, start, stop, step):
+        models = [i for i in range(start, stop+1, step)]
+        self.m = len(models)
+        init_player = 3
+        self.init_result(models)
+        for i in models:
+            self.p1.load(i, self.size)
+            for j in range(i + step, stop+1, step):
+                self.p2.load(j, self.size)
+                for k in range(self.g):
+                    self.play_game(i, j, init_player, k == self.g - 1)
 
     def round_robin(self):
         step = self.episodes // (self.m)
@@ -93,12 +102,15 @@ class Topp:
         for model, result in self.result.items():
             print(
                 "{}: {:.1f}%".format(
-                    model, 100 * result / (self.g * (self.m))
+                    model, 100 * result / (self.g * (self.m-1))
                 )
             )
 
 
 if __name__ == "__main__":
     topp = Topp()
-    topp.round_robin()
+    if config.choose_models:
+        topp.choose_models(config.start, config.stop, config.step)
+    else:
+        topp.round_robin()
     topp.print_result()
