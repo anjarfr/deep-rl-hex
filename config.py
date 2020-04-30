@@ -18,10 +18,10 @@ plot_window_size = 20
 
 episodes = 200  # number of episodes
 simulations = (
-    500  # number of simulations (and hence rollouts) per actual game move
+    800  # number of simulations (and hence rollouts) per actual game move
 )
 c = 1  # exploration constant
-m = 10  # interval of ANETs to be cached for playing TOPP
+m = 20  # interval of ANETs to be cached for playing TOPP
 g = 1  # number of games played in TOPP
 mcts_epsilon = 0
 
