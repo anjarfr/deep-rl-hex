@@ -14,7 +14,7 @@ plot_window_size = 20
 
 # |------------- Agent parameters -------------|
 
-m = 5  # interval of ANETs to be cached for playing TOPP
+m = 10  # interval of ANETs to be cached for playing TOPP
 g = 25  # number of games played in TOPP
 
 activation_hidden = "relu"
@@ -43,4 +43,4 @@ directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     max_buffer_length,
 )
 
-load_directory = directory
+load_directory = 'demo'

@@ -39,11 +39,11 @@ class MCTS:
         the_chosen_one = self.select_move(
             self.root, c=0, stochastic=config.stochastic, epsilon=self.epsilon)
         # print("Chosen", the_chosen_one.action)
-
         # self.root.print_tree()
 
         distribution = self.get_probability_distribution()
         self.root = the_chosen_one
+        #print("Chosen", the_chosen_one.action)
 
         return distribution, the_chosen_one.action
 
