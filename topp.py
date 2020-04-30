@@ -21,11 +21,12 @@ class Topp:
         activation = config.activation_hidden
         optimizer = config.optimizer
         lr = config.learning_rate
+        load_directory = config.load_directory
 
-        load = config.load_directory
-
-        self.p1 = ANET(self.size, dimensions, lr, activation, optimizer, load_directory=load)
-        self.p2 = ANET(self.size, dimensions, lr, activation, optimizer, load_directory=load)
+        self.p1 = ANET(self.size, dimensions, lr, activation,
+                       optimizer, load_directory=load_directory)
+        self.p2 = ANET(self.size, dimensions, lr, activation,
+                       optimizer, load_directory=load_directory)
 
     def init_result(self, models):
         self.result = {}
@@ -36,7 +37,7 @@ class Topp:
         pass
 
     def round_robin(self):
-        step = self.episodes // (self.m - 1)
+        step = self.episodes // (self.m)
         models = [i for i in range(0, self.episodes + 1, step)]
         init_player = 3
         self.init_result(models)
@@ -92,7 +93,7 @@ class Topp:
         for model, result in self.result.items():
             print(
                 "{}: {:.1f}%".format(
-                    model, 100 * result / (self.g * (self.m - 1))
+                    model, 100 * result / (self.g * (self.m))
                 )
             )
 
