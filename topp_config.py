@@ -29,9 +29,9 @@ batch_size = 128
 max_buffer_length = 4000
 
 start = 0
-stop = 600
-step = 100
-choose_models = False
+stop = 1000
+step = 200
+choose_models = True
 
 directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     episodes,
