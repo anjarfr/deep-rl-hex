@@ -1,9 +1,7 @@
 # |---------- Environment parameters ----------|
 board_size = 5  # between 3 and 10
-player = (
-    2  # starting player option, 1, 2 or 3 (mixed) Vet ikke om vi skal ha med 3
-)
-verbose = False  # Whether the details of moves for each game is shown
+player = 3
+verbose = True  # Whether the details of moves for each game is shown
 
 node_size = 1500
 initial_color = "white"
