@@ -16,27 +16,27 @@ plot_window_size = 20
 
 # |------------- Agent parameters -------------|
 
-episodes = 1000  # number of episodes
+episodes = 200  # number of episodes
 simulations = (
     800  # number of simulations (and hence rollouts) per actual game move
 )
 c = 1  # exploration constant
 m = 20  # interval of ANETs to be cached for playing TOPP
 g = 1  # number of games played in TOPP
-mcts_epsilon = 0.00005
+mcts_epsilon = 0
 
-learning_rate = 0.05
+learning_rate = 0.005
 epsilon = 1
-epsilon_decay = 0.995
-dimensions = [128, 64, 32]
+epsilon_decay = 0.98
+dimensions = [64, 64, 64]
 # Number of nodes in each layer goood = en del layers med f�rre eller 1 med flere 1000
 activation_hidden = (
     "relu"  # Choose between 'linear', 'sigmoid', 'tanh' and 'relu'
 )
 optimizer = "adam"  # Choose between 'adagrad', 'sgd', 'rmsprop' and 'adam'
-epochs = 10
-batch_size = 128
-max_buffer_length = 3000
+epochs = 50
+batch_size = 32
+max_buffer_length = 1000
 save_directory = "ep{}_sim{}_epo{}_dim{}_lr{}_bs{}_max{}".format(
     episodes,
     simulations,
