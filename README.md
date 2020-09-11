@@ -1,24 +1,5 @@
 # On-Policy Monte Carlo Tree Search for Game Playing
 
-## TODO
-- [x] Hex logikk
-- [x] Visualisere boardet
-- [x] ANET - fjerne eligibilities
-- [x] RBUF
-- [x] Finne ut hvordan illegal moves settes til 0 
-- [x] Implementere e-greedy for rollout og choose action
-- [x] Litt randomness på target policy også (sigma)  
-- [x] Finne ut hvilke variabler vi trenger i config 
-- [ ] Implementere at vi både får evaluation og prob dist som output fra ANET som vi kan bruke som critic
-- [x] Implementere accuracy
-- [ ] Add rollout nodes to backprop path
-- [x] Select actual move in MCTS use visit count
-- [x] Include current player in state from MCTS
-- [x] Make sure its not allowed to "perform action" on an already filled cell
-
-### TODO TOPP
-- [x] Make sure actual games can be visualized
-
 This project consist of four main parts: the game, the state manager, the actor and the MCTS system.
 
 ### State manager
